@@ -1,2 +1,2 @@
 # mimic3-literatures-phenotyping
-The experiment of model : join the result of LDA with the MLP
+Original experiment code of the model which joins the result of LDA with the MLP
