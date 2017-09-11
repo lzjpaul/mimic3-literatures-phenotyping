@@ -38,8 +38,22 @@ import datetime
 # a=[1,1,1,1,3,3,4,4]
 # start = a.index(0) if a.__contains__(0) else 0
 # print range(start, len(a))
-print 1/(3*1.0)
-print np.ceil(1/(3*1.0))
-a = [1,2,3,4,5]
-a.extend([44])
-print a
+# print 1/(3*1.0)
+# print np.ceil(1/(3*1.0))
+# a = [1,2,3,4,5]
+# a.extend([44])
+# print a
+# a = "alteplase 1mg/flush volume ( dialysis/pheresis catheters )"
+# for word_tmp in a.split(" "):
+#     print word_tmp
+#     tmp = word_tmp.lower()
+#     if len(tmp) > 0 and any(char.isalpha() for char in tmp):
+#         print tmp
+# print a.isalpha()
+# print a
+# print a[:-1]
+tmp = "34mg"
+print tmp.endswith("mg")
+print tmp[:-2].isdigit()
+if tmp.endswith("mg") and len(tmp) > 2 and tmp[:-2].isdigit():
+    print "OK"

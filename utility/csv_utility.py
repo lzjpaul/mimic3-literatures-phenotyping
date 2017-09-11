@@ -56,6 +56,7 @@ class CsvUtility(object):
             f.close()
         return obj
 
+    @staticmethod
     def write_text2csv(raw_dict, csv_path, file_name):
         pd.DataFrame.from_dict(raw_dict, orient='index').to_csv(os.path.join(csv_path, file_name), header=False)
 

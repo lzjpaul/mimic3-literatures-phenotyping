@@ -2,8 +2,6 @@ import numpy as np
 from sklearn import linear_model
 from sklearn import metrics
 
-from baseline_method.compute_accurency import getAUC
-
 
 class MultiLogistic(object):
     def __init__(self, num_logs):
@@ -24,14 +22,14 @@ class MultiLogistic(object):
             self.models[i].fit(training_x, training_y[:, i])
 
     def testing(self, testing_x, testing_y):
-        #auc_list = []
+        # auc_list = []
         re_list = []
         for i in range(self.num_logs):
             re_y = self.models[i].predict_proba(testing_x)[:, 1]
             # print testing_y[:, i]
             # print re_y
             re_list.append(re_y)
-            #auc_list.append(getAUC(testing_y[:, i], re_y))
+            # auc_list.append(getAUC(testing_y[:, i], re_y))
         print len(testing_x), self.num_logs
         print len(re_list), len(re_list[0])
         re_list = np.array(re_list).T

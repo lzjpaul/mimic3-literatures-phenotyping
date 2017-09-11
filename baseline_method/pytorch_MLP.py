@@ -19,9 +19,10 @@ hidden_size = 500
 num_classes = 2
 num_epochs = 5
 batch_size = 100
-train_batch_num = int(np.ceil(train_x.shape[0]/(batch_size*1.0)))
-test_batch_num = int(np.ceil(test_x.shape[0]/(batch_size*1.0)))
+train_batch_num = int(np.ceil(train_x.shape[0] / (batch_size * 1.0)))
+test_batch_num = int(np.ceil(test_x.shape[0] / (batch_size * 1.0)))
 learning_rate = 0.001
+
 
 # Neural Network Model (1 hidden layer)
 class Net(nn.Module):
@@ -62,7 +63,7 @@ for pred_i in range(len(train_y[0])):
         for i in range(train_batch_num):
             # Convert numpy array to torch Variable
             start_pos = i * batch_size
-            end_pos = np.min([(i+1)*batch_size, trainset.shape[0]])
+            end_pos = np.min([(i + 1) * batch_size, trainset.shape[0]])
             inputs = Variable(torch.from_numpy(trainset[start_pos:end_pos, :-1])).float()
             targets = Variable(torch.from_numpy(trainset[start_pos:end_pos, -1])).long()
 
@@ -80,7 +81,6 @@ for pred_i in range(len(train_y[0])):
     # Test the Model
     res = []
     for i in range(test_batch_num):
-
         start_pos = i * batch_size
         end_pos = np.min([(i + 1) * batch_size, testset.shape[0]])
         inputs = Variable(torch.from_numpy(testset[start_pos:end_pos, :-1])).float()

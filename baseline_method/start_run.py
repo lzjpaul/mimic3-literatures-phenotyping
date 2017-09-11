@@ -1,7 +1,5 @@
-import pandas as pd
-import numpy as np
-from load_data import load_corpus
 from baseline_method.multi_logistic_model import MultiLogistic
+from load_data import load_corpus
 from utility.csv_utility import CsvUtility
 
 if __name__ == '__main__':

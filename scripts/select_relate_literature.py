@@ -81,6 +81,9 @@ if __name__ == '__main__':
 
     # use the maps of entity and ICD code to filter the document
     entity_df = pd.read_csv(os.path.join(args.output_path, args.entity_file), header=None)
+    print "entity map:"
+    print entity_df[:5]
+
     entity_map = {}
     for i in range(entity_df.shape[0]):
         assert entity_df.ix[i, 1] not in entity_map
