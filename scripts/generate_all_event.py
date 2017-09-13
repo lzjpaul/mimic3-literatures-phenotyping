@@ -16,51 +16,85 @@ from utility.directory_utility import Directory
 from utility.nlp_utility import NLP_Utility
 
 
-Path = '/Users/yangkai/Desktop/daily_work/MIMIC-III/data'
+Path = 'E:\medical data\MIMICIII_data'
 
 def icd_diagnoses_over(filename, over_num):
-    diagnoses_df = pd.read_csv(os.path.join(Path, filename))[['HADM_ID', 'ICD9_CODE']]
+    diagnoses_df = pd.read_csv(os.path.join(Path, filename), dtype=str)[['HADM_ID', 'ICD9_CODE']]
     print diagnoses_df[:5]
     print diagnoses_df.shape
     diagnoses_df.drop_duplicates(inplace=True)
     print diagnoses_df.shape
     diag_count = diagnoses_df['ICD9_CODE'].value_counts()
+    print diag_count
     diag_df = pd.DataFrame(diag_count[diag_count > over_num])
     diag_df.columns = ['COUNT']
     diag_df.index.name = 'ICD9_CODE'
     print diag_df[:5]
     print 'size:', diag_df.shape
-    CsvUtility.write2pickle('../data-repository/icd_diagnoses_over.pickle', diag_df, 'w')
+    CsvUtility.write2pickle('../data-repository/icd_diagnoses_over.pkl', diag_df, 'w')
 
 
 def subject_admission_over(filename, over_num):
-    admission_df = pd.read_csv(os.path.join(Path, filename))
+    admission_df = pd.read_csv(os.path.join(Path, filename), dtype=str)
     # print admission_df[:5]
     # admission_df.filter(items=['SUBJECT_ID'], like=)
+    print admission_df[:5]
+    print admission_df.shape
+    admission_df.drop_duplicates(inplace=True)
+    print admission_df.shape
     sub_vc = admission_df['SUBJECT_ID'].value_counts()
     sub_df = pd.DataFrame(sub_vc[sub_vc > over_num])
     sub_df.columns = ['COUNT']
     sub_df.index.name = 'SUBJECT_ID'
     print sub_df[:5]
     print 'size: ', sub_df.shape
-    with open('../data-repository/subject_admission_over.pickle', 'w') as f:
-        pickle.dump(sub_df, f)
-        f.close()
+    CsvUtility.write2pickle('../data-repository/subject_admission_over.pkl', sub_df, 'w')
+
+
+def get_lab_item_over(file_name, over_num):
+    labevent_df = pd.read_csv(os.path.join(Path, file_name), dtype=str)[['HADM_ID', 'ITEMID', 'FLAG']]
+    print labevent_df[:5]
+    print labevent_df.shape
+    labevent_df = labevent_df[labevent_df['FLAG'] == 'abnormal']
+    print labevent_df.shape
+    labevent_df.drop_duplicates(inplace=True)
+    print labevent_df.shape
+    item_count = labevent_df['ITEMID'].value_counts()
+    item_df = pd.DataFrame(item_count[item_count > over_num])
+    item_df.columns = ['COUNT']
+    item_df.index.name = 'ITEMID'
+    print item_df[:5]
+    print 'size:', item_df.shape
+    CsvUtility.write2pickle('../data-repository/lab_item_over.pkl', item_df, 'w')
+
+
+def get_drug_over(file_name, over_num):
+    drug_df = pd.read_csv(os.path.join(Path, file_name), dtype=str)[['HADM_ID', 'FORMULARY_DRUG_CD']]
+    print drug_df[:5]
+    print drug_df.shape
+    drug_df.drop_duplicates(inplace=True)
+    print drug_df.shape
+    drug_count = drug_df['FORMULARY_DRUG_CD'].value_counts()
+    drug_df = pd.DataFrame(drug_count[drug_count > over_num])
+    drug_df.columns = ['COUNT']
+    drug_df.index.name = 'FORMULARY_DRUG_CD'
+    print drug_df[:5]
+    print 'size:', drug_df.shape
+    CsvUtility.write2pickle('../data-repository/prescription_drug_over.pkl', drug_df, 'w')
 
 
 def get_all_diagnoses_event():
-
-    diagnoses_df = pd.read_csv(os.path.join(Path, 'DIAGNOSES_ICD.csv'))
+    diagnoses_df = pd.read_csv(os.path.join(Path, 'DIAGNOSES_ICD.csv'), dtype=str)
     # print diagnoses_df[:5]
-    admission_df = pd.read_csv(os.path.join(Path, 'ADMISSIONS.csv'))
+    admission_df = pd.read_csv(os.path.join(Path, 'ADMISSIONS.csv'), dtype=str)
     # print admission_df[:5]
     diagnoses_event = pd.merge(diagnoses_df[['SUBJECT_ID', 'HADM_ID', 'ICD9_CODE']],
                                admission_df[['HADM_ID', 'DISCHTIME', 'DIAGNOSIS']], 'left', on='HADM_ID')
     diagnoses_event['DIAGNOSIS'] = ['diagnosis'] * diagnoses_event.shape[0]
     # print diagnoses_event[:10]
     # print diagnoses_event.shape
-    icd_df = CsvUtility.read_pickle('../data-repository/icd_diagnoses_over.pickle', 'r')
-    sub_df = CsvUtility.read_pickle('../data-repository/subject_admission_over.pickle', 'r')
+    icd_df = CsvUtility.read_pickle('../data-repository/icd_diagnoses_over.pkl', 'r')
+    sub_df = CsvUtility.read_pickle('../data-repository/subject_admission_over.pkl', 'r')
     diagnoses_set = list(pd.read_csv('../data-repository/merge_diagnoses_dict.csv', header=None).index)
     diagnoses_event = diagnoses_event[diagnoses_event['SUBJECT_ID'].isin(list(sub_df.index)) &
                                                        diagnoses_event['ICD9_CODE'].isin(list(icd_df.index))]
@@ -95,22 +129,6 @@ def get_all_diagnoses_event():
     print len(set(list(diagnoses_event['ICD9_CODE']))), len(set(list(diagnoses_event['icd9_3'])))
     return diagnoses_event
 
-def get_lab_item_over(file_name, over_num):
-    labevent_df = pd.read_csv(os.path.join(Path, file_name))[['HADM_ID', 'ITEMID', 'FLAG']]
-    print labevent_df[:5]
-    print labevent_df.shape
-    labevent_df = labevent_df[labevent_df['FLAG'] == 'abnormal']
-    print labevent_df.shape
-    labevent_df.drop_duplicates(inplace=True)
-    print labevent_df.shape
-    item_count = labevent_df['ITEMID'].value_counts()
-    item_df = pd.DataFrame(item_count[item_count > over_num])
-    item_df.columns = ['COUNT']
-    item_df.index.name = 'ITEMID'
-    print item_df[:5]
-    print 'size:', item_df.shape
-    CsvUtility.write2pickle('../data-repository/lab_item_over.pickle', item_df, 'w')
-
 
 def get_lab_event():
     labevent_df = pd.read_csv(os.path.join(Path, 'LABEVENTS.csv'), dtype={'HADM_ID': str})[['SUBJECT_ID', 'HADM_ID', 'CHARTTIME', 'ITEMID', 'FLAG']]
@@ -130,19 +148,7 @@ def get_lab_event():
     print len(set(list(labevent_df['ITEMID'])))
     return labevent_df
 
-def get_drug_over(file_name, over_num):
-    drug_df = pd.read_csv(os.path.join(Path, file_name))[['HADM_ID', 'FORMULARY_DRUG_CD']]
-    print drug_df[:5]
-    print drug_df.shape
-    drug_df.drop_duplicates(inplace=True)
-    print drug_df.shape
-    drug_count = drug_df['FORMULARY_DRUG_CD'].value_counts()
-    drug_df = pd.DataFrame(drug_count[drug_count > over_num])
-    drug_df.columns = ['COUNT']
-    drug_df.index.name = 'FORMULARY_DRUG_CD'
-    print drug_df[:5]
-    print 'size:', drug_df.shape
-    CsvUtility.write2pickle('../data-repository/prescription_drug_over.pickle', drug_df, 'w')
+
 
 def get_medication_event():
     medication_df = pd.read_csv(os.path.join(Path, 'PRESCRIPTIONS.csv'))[['SUBJECT_ID', 'HADM_ID', 'STARTDATE', 'DRUG_TYPE', 'FORMULARY_DRUG_CD']]
@@ -221,12 +227,6 @@ def filter_all_event():
     print all_events_df.shape
     CsvUtility.write2pickle('../data-repository/all_events_icd9.pickle', all_events_df, 'w')
 
-
-
-
-
-
-
 if __name__ == '__main__':
     # parser = argparse.ArgumentParser(description="Extract EHR data from MIMICIII dataset.")
     # parser.add_argument('doc_origin_path', type=str,
@@ -238,14 +238,19 @@ if __name__ == '__main__':
     #     os.makedirs(args.output_path)
     # except Exception:
     #     pass
-    # subject_admission_over('ADMISSIONS.csv', 1)
-    # icd_diagnoses_over('DIAGNOSES_ICD.csv', 5)
+    print "prepare the dict of subject(patient), diagnosis, medication, labtest by limit minimal count number"
+    subject_admission_over('ADMISSIONS.csv', 1)
+    print "============================================================================="
+    icd_diagnoses_over('DIAGNOSES_ICD.csv', 5)
+    print "============================================================================="
+    get_lab_item_over('LABEVENTS.csv', 10)
+    print "============================================================================="
+    get_drug_over('PRESCRIPTIONS.csv', 10)
+    print "============================================================================="
     # get_all_diagnoses_event()
-    # get_lab_item_over('LABEVENTS.csv', 50)
     # get_lab_event()
-    # get_drug_over('PRESCRIPTIONS.csv', 50)
     # get_medication_event()
-    get_events_together()
+    # get_events_together()
     # filter_all_event()
     print '******************************************************************************'
 #test code

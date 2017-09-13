@@ -52,8 +52,10 @@ import datetime
 # print a.isalpha()
 # print a
 # print a[:-1]
-tmp = "34mg"
-print tmp.endswith("mg")
-print tmp[:-2].isdigit()
-if tmp.endswith("mg") and len(tmp) > 2 and tmp[:-2].isdigit():
-    print "OK"
+tmp = "34-Mg"
+# print tmp.endswith("mg")
+# print tmp[:-2].isdigit()
+# if tmp.endswith("mg") and len(tmp) > 2 and tmp[:-2].isdigit():
+#     print "OK"
+import re
+print re.sub("[^a-zA-Z-]", "", tmp.lower())
