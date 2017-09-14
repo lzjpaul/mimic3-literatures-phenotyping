@@ -34,6 +34,22 @@ def icd_diagnoses_over(filename, over_num):
     CsvUtility.write2pickle('../data-repository/icd_diagnoses_over.pkl', diag_df, 'w')
 
 
+def icd_procedures_over(filename, over_num):
+    procedures_df = pd.read_csv(os.path.join(Path, filename), dtype=str)[['HADM_ID', 'ICD9_CODE']]
+    print procedures_df[:5]
+    print procedures_df.shape
+    procedures_df.drop_duplicates(inplace=True)
+    print procedures_df.shape
+    procedure_count = procedures_df['ICD9_CODE'].value_counts()
+    print procedure_count
+    procedure_df = pd.DataFrame(procedure_count[procedure_count > over_num])
+    procedure_df.columns = ['COUNT']
+    procedure_df.index.name = 'ICD9_CODE'
+    print procedure_df[:5]
+    print 'size:', procedure_df.shape
+    CsvUtility.write2pickle('../data-repository/icd_procedures_over.pkl', procedure_df, 'w')
+
+
 def subject_admission_over(filename, over_num):
     admission_df = pd.read_csv(os.path.join(Path, filename), dtype=str)
     # print admission_df[:5]
@@ -238,15 +254,17 @@ if __name__ == '__main__':
     #     os.makedirs(args.output_path)
     # except Exception:
     #     pass
-    print "prepare the dict of subject(patient), diagnosis, medication, labtest by limit minimal count number"
-    subject_admission_over('ADMISSIONS.csv', 1)
+    # print "prepare the dict of subject(patient), diagnosis, medication, labtest by limit minimal count number"
+    # subject_admission_over('ADMISSIONS.csv', 1)
+    # print "============================================================================="
+    # icd_diagnoses_over('DIAGNOSES_ICD.csv', 5)
+    # print "============================================================================="
+    icd_procedures_over('PROCEDURES_ICD.csv', 5)
     print "============================================================================="
-    icd_diagnoses_over('DIAGNOSES_ICD.csv', 5)
-    print "============================================================================="
-    get_lab_item_over('LABEVENTS.csv', 10)
-    print "============================================================================="
-    get_drug_over('PRESCRIPTIONS.csv', 10)
-    print "============================================================================="
+    # get_lab_item_over('LABEVENTS.csv', 10)
+    # print "============================================================================="
+    # get_drug_over('PRESCRIPTIONS.csv', 10)
+    # print "============================================================================="
     # get_all_diagnoses_event()
     # get_lab_event()
     # get_medication_event()

@@ -59,3 +59,5 @@ tmp = "34-Mg"
 #     print "OK"
 import re
 print re.sub("[^a-zA-Z-]", "", tmp.lower())
+rr = 4
+print rr in [1,2,3,4]
