@@ -18,6 +18,7 @@ from utility.nlp_utility import NLP_Utility
 
 Path = 'E:\medical data\MIMICIII_data'
 
+
 def icd_diagnoses_over(filename, over_num):
     diagnoses_df = pd.read_csv(os.path.join(Path, filename), dtype=str)[['HADM_ID', 'ICD9_CODE']]
     print diagnoses_df[:5]
@@ -99,6 +100,8 @@ def get_drug_over(file_name, over_num):
     CsvUtility.write2pickle('../data-repository/prescription_drug_over.pkl', drug_df, 'w')
 
 
+# new-update:
+# don not use the merge_diagnoses_dict anymore, because donot limit the ICD code into three, use the full ICD code
 def get_all_diagnoses_event():
     diagnoses_df = pd.read_csv(os.path.join(Path, 'DIAGNOSES_ICD.csv'), dtype=str)
     # print diagnoses_df[:5]
@@ -107,42 +110,67 @@ def get_all_diagnoses_event():
     diagnoses_event = pd.merge(diagnoses_df[['SUBJECT_ID', 'HADM_ID', 'ICD9_CODE']],
                                admission_df[['HADM_ID', 'DISCHTIME', 'DIAGNOSIS']], 'left', on='HADM_ID')
     diagnoses_event['DIAGNOSIS'] = ['diagnosis'] * diagnoses_event.shape[0]
-    # print diagnoses_event[:10]
-    # print diagnoses_event.shape
-    icd_df = CsvUtility.read_pickle('../data-repository/icd_diagnoses_over.pkl', 'r')
+    print diagnoses_event[:10]
+    print diagnoses_event.shape
+    # print diagnoses_event.dtypes
+    # print type(diagnoses_event.ix[0, 0])
+    # new update:
+    # here icd_diagnoses_over is useless, because the revert_diagnoses_dict already use the "over" to limit the dict
+    # icd_df = CsvUtility.read_pickle('../data-repository/icd_diagnoses_over.pkl', 'r')
+    diagnoses_list = np.array(pd.read_csv('../data-repository/revert_diagnoses_procedures.csv', index_col=[0], header=None).values).flatten()
+    # print diagnoses_list
+    # print len(diagnoses_list)
     sub_df = CsvUtility.read_pickle('../data-repository/subject_admission_over.pkl', 'r')
-    diagnoses_set = list(pd.read_csv('../data-repository/merge_diagnoses_dict.csv', header=None).index)
-    diagnoses_event = diagnoses_event[diagnoses_event['SUBJECT_ID'].isin(list(sub_df.index)) &
-                                                       diagnoses_event['ICD9_CODE'].isin(list(icd_df.index))]
+    diagnoses_event = diagnoses_event[diagnoses_event['SUBJECT_ID'].isin(np.array(list(sub_df.index), dtype=str)) & diagnoses_event['ICD9_CODE'].isin(diagnoses_list)]
+    print diagnoses_event.shape
+    print diagnoses_event[:10]
     ######################################
-    print 'additional process'
-    np_diagnoses_event = np.array(diagnoses_event)
-    new_diagnoses_event = []
-    diagnoses_set = set(list(pd.read_csv('../data-repository/merge_diagnoses_dict.csv', header=None)[0]))
-    for i in range(len(np_diagnoses_event)):
-        if np_diagnoses_event[i][2] != np.NaN and len(np_diagnoses_event[i][2]) >= 3 and np_diagnoses_event[i][2][:3] in diagnoses_set:
-            new_line = []
-            new_line.extend(np_diagnoses_event[i])
-            new_line.append(np_diagnoses_event[i][2][:3])
-            if re.match('^V.*', np_diagnoses_event[i][2]):
-                new_line[4] = 'condition'
-            if re.match('^7[89]\d.*', np_diagnoses_event[i][2]):
-                new_line[4] = 'symptom'
-            new_diagnoses_event.append(new_line)
-        if i % 10000 == 0:
-            print i
-    new_columns = list(diagnoses_event.columns)
-    new_columns.append('icd9_3')
-    print new_columns
-    print new_diagnoses_event[:5]
-    diagnoses_event = pd.DataFrame(new_diagnoses_event)
-    diagnoses_event.columns = new_columns
+    # print 'additional process'
+    # np_diagnoses_event = np.array(diagnoses_event)
+    # new_diagnoses_event = []
+    #
+    # for i in range(len(np_diagnoses_event)):
+    #     if np_diagnoses_event[i][2] != np.NaN and len(np_diagnoses_event[i][2]) >= 3 and np_diagnoses_event[i][2][:3] in diagnoses_set:
+    #         new_line = []
+    #         new_line.extend(np_diagnoses_event[i])
+    #         new_line.append(np_diagnoses_event[i][2][:3])
+    #         if re.match('^V.*', np_diagnoses_event[i][2]):
+    #             new_line[4] = 'condition'
+    #         if re.match('^7[89]\d.*', np_diagnoses_event[i][2]):
+    #             new_line[4] = 'symptom'
+    #         new_diagnoses_event.append(new_line)
+    #     if i % 10000 == 0:
+    #         print i
+    # new_columns = list(diagnoses_event.columns)
+    # new_columns.append('icd9_3')
+    # print new_columns
+    # print new_diagnoses_event[:5]
+    # diagnoses_event = pd.DataFrame(new_diagnoses_event)
+    # diagnoses_event.columns = new_columns
 
+    ######################################
+    ######################################
+    # just add the 'condition' and 'symptom' and do not use the icd9_3 anymore..
+    print "new additional processing ..."
+    np_diagnosis_events = np.array(diagnoses_event)
+    new_diagnosis_events = []
+    for i in range(len(np_diagnosis_events)):
+        new_diagnosis_events.append(np_diagnosis_events[i])
+        if re.match('^V.*', np_diagnosis_events[i][2]):
+            new_diagnosis_events[-1][4] = 'condition'
+        elif re.match('^7[89]\d.*]', np_diagnosis_events[i][2]):
+            new_diagnosis_events[-1][4] = 'symptom'
+        if i%10000 == 0:
+            print "processing the ", i, "line"
+    new_columns = list(diagnoses_event.columns)
+    print  new_columns
+    diagnoses_event = pd.DataFrame(new_diagnosis_events)
+    diagnoses_event.columns = new_columns
     ######################################
 
     print diagnoses_event[:10]
     print diagnoses_event.shape
-    print len(set(list(diagnoses_event['ICD9_CODE']))), len(set(list(diagnoses_event['icd9_3'])))
+    print len(set(list(diagnoses_event['ICD9_CODE'])))
     return diagnoses_event
 
 
@@ -165,7 +193,6 @@ def get_lab_event():
     return labevent_df
 
 
-
 def get_medication_event():
     medication_df = pd.read_csv(os.path.join(Path, 'PRESCRIPTIONS.csv'))[['SUBJECT_ID', 'HADM_ID', 'STARTDATE', 'DRUG_TYPE', 'FORMULARY_DRUG_CD']]
 
@@ -181,6 +208,7 @@ def get_medication_event():
     print medication_df.shape
     print len(set(list(medication_df['FORMULARY_DRUG_CD'])))
     return medication_df
+
 
 def get_events_together():
     columns_name = ['hadm_id', 'subject_id', 'charttime', 'event_type', 'event', 'icd9_3']
@@ -217,6 +245,7 @@ def get_events_together():
     # all_events.dropna(axis=0, how='any', subset=['event'], inplace=True)
     # print all_events.shape
 
+
 def filter_all_event():
     all_events_df = CsvUtility.read_pickle('../data-repository/allevents.pickle', 'r')
     all_events_df['icd9_3'] = ''
@@ -243,6 +272,7 @@ def filter_all_event():
     print all_events_df.shape
     CsvUtility.write2pickle('../data-repository/all_events_icd9.pickle', all_events_df, 'w')
 
+
 if __name__ == '__main__':
     # parser = argparse.ArgumentParser(description="Extract EHR data from MIMICIII dataset.")
     # parser.add_argument('doc_origin_path', type=str,
@@ -259,18 +289,18 @@ if __name__ == '__main__':
     # print "============================================================================="
     # icd_diagnoses_over('DIAGNOSES_ICD.csv', 5)
     # print "============================================================================="
-    icd_procedures_over('PROCEDURES_ICD.csv', 5)
-    print "============================================================================="
+    # icd_procedures_over('PROCEDURES_ICD.csv', 5)
+    # print "============================================================================="
     # get_lab_item_over('LABEVENTS.csv', 10)
     # print "============================================================================="
     # get_drug_over('PRESCRIPTIONS.csv', 10)
     # print "============================================================================="
     # get_all_diagnoses_event()
-    # get_lab_event()
+    get_lab_event()
     # get_medication_event()
     # get_events_together()
     # filter_all_event()
     print '******************************************************************************'
-#test code
+# est code
 
-#python select_relate_literature.py '../data-repository/BMC_Musuloskelet_Disord' '../data-repository' 'merge_diagnoses_word_dict.csv'
+# python select_relate_literature.py '../data-repository/BMC_Musuloskelet_Disord' '../data-repository' 'merge_diagnoses_word_dict.csv'

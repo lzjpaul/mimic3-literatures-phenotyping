@@ -57,7 +57,15 @@ tmp = "34-Mg"
 # print tmp[:-2].isdigit()
 # if tmp.endswith("mg") and len(tmp) > 2 and tmp[:-2].isdigit():
 #     print "OK"
-import re
-print re.sub("[^a-zA-Z-]", "", tmp.lower())
-rr = 4
-print rr in [1,2,3,4]
+# import re
+# print re.sub("[^a-zA-Z-]", "", tmp.lower())
+# rr = 4
+# print rr in [1,2,3,4]
+import pandas as pd
+import numpy as np
+
+a = pd.DataFrame(np.random.randint(0, 7, size=(4, 5)))
+print a
+print type(np.array(a))
+print type(a.values)
+

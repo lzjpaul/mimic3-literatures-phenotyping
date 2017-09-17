@@ -16,7 +16,8 @@ stop_list = {"of", "and", "by", "to", "or", "the", "in", "with"
                  , "a", "its", "may", "after", "any", "d", "be", "into"
                  , "their", "which", "an", "*nf", "nf*", "but", "but"
                  , "", "-", "c", "c-c", "w", "e", "o", "b", "m", "g"
-                 , "s", "h", "t-t", "un", "ve", "k", "u", "j"}
+                 , "s", "h", "t-t", "un", "ve", "k", "u", "j", "t"
+                 , "n"}
 
 
 # extract the dict of ICD9 codes and map it to its descriptions from the standard file DC_3D11.txt
