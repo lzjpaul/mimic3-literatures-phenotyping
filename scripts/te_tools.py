@@ -21,7 +21,7 @@ import datetime
 # print frame.dtypes
 # print type(frame.ix[2, 1])
 # print 'reading.....'
-# all_events = CsvUtility.read_pickle('../data-repository/allevents.pickle', 'r')
+# all_events = CsvUtility.read_pickle('../data-repository/allevents.pkl', 'r')
 # print all_events.shape
 # all_events.dropna(axis=0, how='any', subset=['subject_id', 'charttime', 'event', 'hadm_id'], inplace=True)
 # print all_events.shape
@@ -61,11 +61,15 @@ tmp = "34-Mg"
 # print re.sub("[^a-zA-Z-]", "", tmp.lower())
 # rr = 4
 # print rr in [1,2,3,4]
-import pandas as pd
-import numpy as np
-
-a = pd.DataFrame(np.random.randint(0, 7, size=(4, 5)))
-print a
-print type(np.array(a))
-print type(a.values)
+# import pandas as pd
+# import numpy as np
+#
+# a = pd.DataFrame(np.random.randint(0, 7, size=(4, 5)))
+# print a
+# print type(np.array(a))
+# print type(a.values)
+# for i in range(8, 8):
+#     print i
+a = [1,2,3,4,5]
+print a + a
 

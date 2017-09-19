@@ -124,11 +124,11 @@ if __name__ == '__main__':
     print "vocabulary size : ", len(vocabulary_count)
     print "using entity size : ", len(used_entity_count)
     print "num of docs having entity : ", len(doc2entity)
-    CsvUtility.write_text2csv(raw_dict=vocabulary_count, csv_path=args.output_path,
+    CsvUtility.write_dict2csv(raw_dict=vocabulary_count, csv_path=args.output_path,
                               file_name='literature_vocabulary.csv')
-    CsvUtility.write_text2csv(raw_dict=used_entity_count, csv_path=args.output_path,
+    CsvUtility.write_dict2csv(raw_dict=used_entity_count, csv_path=args.output_path,
                               file_name='used_entity.csv')
-    CsvUtility.write_text2csv(raw_dict=doc2entity, csv_path=args.output_path,
+    CsvUtility.write_dict2csv(raw_dict=doc2entity, csv_path=args.output_path,
                               file_name='doc2entity.csv')
     print '******************************************************************************'
 #test code

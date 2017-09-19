@@ -81,7 +81,7 @@ def set_p_features():
 
 def get_sequence():
     print 'reading.....'
-    all_events = CsvUtility.read_pickle('../data-repository/allevents.pickle', 'r')
+    all_events = CsvUtility.read_pickle('../data-repository/allevents.pkl', 'r')
     print all_events.shape
     all_events.dropna(axis=0, how='any', subset=['subject_id', 'charttime', 'event', 'hadm_id'], inplace=True)
     print all_events.shape

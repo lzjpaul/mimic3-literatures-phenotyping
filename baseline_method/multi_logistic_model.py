@@ -14,8 +14,8 @@ class MultiLogistic(object):
             )
 
     def training(self, training_x, training_y):
-        assert len(training_x) == len(training_y)
-        assert self.num_logs == len(training_y[0])
+        # assert len(training_x) == len(training_y)
+        # assert self.num_logs == len(training_y[0])
         for i in range(self.num_logs):
             print 'training :', i
             # print training_x.shape, training_y.shape

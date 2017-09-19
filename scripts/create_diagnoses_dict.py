@@ -141,7 +141,7 @@ def remove_quotation_from_str(str):
 original_path = 'E:\medical data\MIMICIII_data'
 
 # prescription_df = pd.read_csv(os.path.join(original_path, 'PRESCRIPTIONS.csv'), dtype=str)
-# drug_df = CsvUtility.read_pickle('../data-repository/prescription_drug_over.pickle', 'r')
+# drug_df = CsvUtility.read_pickle('../data-repository/prescription_drug_over.pkl', 'r')
 # # print type(list(drug_df.index)[0])
 # # print np.array(list(drug_df.index), dtype=str)
 # print prescription_df.shape
@@ -206,7 +206,7 @@ original_path = 'E:\medical data\MIMICIII_data'
 
 # labtest revert dict, same to prescription
 # labtest_df = pd.read_csv(os.path.join(original_path, 'D_LABITEMS.csv'), dtype=str)
-# item_df = CsvUtility.read_pickle('../data-repository/lab_item_over.pickle', 'r')
+# item_df = CsvUtility.read_pickle('../data-repository/lab_item_over.pkl', 'r')
 # print item_df[:5]
 # print type(list(item_df.index)[0])
 # print labtest_df.shape
@@ -277,7 +277,7 @@ for i in range(len(icd_merge_list)):
     revert_diagnoses_procedures[" ".join(wordlist)] = icd_merge_list[i][0]
     for word in wordlist:
         word_count[word] = word_count[word] + 1 if word in word_count else 1
-CsvUtility.write_text2csv(revert_diagnoses_procedures, '../data-repository/', 'revert_diagnoses_procedures.csv')
+CsvUtility.write_dict2csv(revert_diagnoses_procedures, '../data-repository/', 'revert_diagnoses_procedures.csv')
 # CsvUtility.write_text2csv(word_count, '../data-repository/', 'revert_ICD_word_dict.csv')
 with open("../data-repository/revert_ICD_word_dict.csv", 'w') as w:
         for (key, value) in sorted(word_count.items(), key=lambda s: s[1], reverse=True):

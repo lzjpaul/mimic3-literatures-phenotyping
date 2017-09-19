@@ -102,9 +102,17 @@ def get_drug_over(file_name, over_num):
 
 # new-update:
 # don not use the merge_diagnoses_dict anymore, because donot limit the ICD code into three, use the full ICD code
+#  add the procedures events
 def get_all_diagnoses_event():
     diagnoses_df = pd.read_csv(os.path.join(Path, 'DIAGNOSES_ICD.csv'), dtype=str)
-    # print diagnoses_df[:5]
+    procedures_df = pd.read_csv(os.path.join(Path, 'PROCEDURES_ICD.csv'), dtype=str)
+    print procedures_df[:5]
+    print procedures_df.shape
+    print diagnoses_df[:5]
+    print diagnoses_df.shape
+    diagnoses_df = pd.concat([diagnoses_df, procedures_df], axis=0)
+    print diagnoses_df[:5]
+    print diagnoses_df.shape
     admission_df = pd.read_csv(os.path.join(Path, 'ADMISSIONS.csv'), dtype=str)
     # print admission_df[:5]
     diagnoses_event = pd.merge(diagnoses_df[['SUBJECT_ID', 'HADM_ID', 'ICD9_CODE']],
@@ -164,7 +172,7 @@ def get_all_diagnoses_event():
             print "processing the ", i, "line"
     new_columns = list(diagnoses_event.columns)
     print  new_columns
-    diagnoses_event = pd.DataFrame(new_diagnosis_events)
+    diagnoses_event = pd.DataFrame(new_diagnosis_events, dtype=str)
     diagnoses_event.columns = new_columns
     ######################################
 
@@ -174,8 +182,11 @@ def get_all_diagnoses_event():
     return diagnoses_event
 
 
+# new update:
+# here lab_item_over is useless, because the revert_labtest_dict already use the "over" to limit the dict
+# don not have icd9_3 anymore
 def get_lab_event():
-    labevent_df = pd.read_csv(os.path.join(Path, 'LABEVENTS.csv'), dtype={'HADM_ID': str})[['SUBJECT_ID', 'HADM_ID', 'CHARTTIME', 'ITEMID', 'FLAG']]
+    labevent_df = pd.read_csv(os.path.join(Path, 'LABEVENTS.csv'), dtype=str)[['SUBJECT_ID', 'HADM_ID', 'CHARTTIME', 'ITEMID', 'FLAG']]
     labevent_df = labevent_df[labevent_df['FLAG'] == 'abnormal']
     labevent_df['FLAG']=['labevent'] * labevent_df.shape[0]
     # labevent_df['SUBJECT_ID'] = labevent_df['SUBJECT_ID'].astype('str')
@@ -183,16 +194,22 @@ def get_lab_event():
     print labevent_df[-5:]
     print labevent_df.shape
     print labevent_df.dtypes
-    sub_df = CsvUtility.read_pickle('../data-repository/subject_admission_over.pickle', 'r')
-    item_df = CsvUtility.read_pickle('../data-repository/lab_item_over.pickle', 'r')
-    labevent_df = labevent_df[labevent_df['SUBJECT_ID'].isin(list(sub_df.index)) &
-                              labevent_df['ITEMID'].isin(list(item_df.index))]
-    labevent_df['icd9_3'] = [''] * labevent_df.shape[0]
+    sub_df = CsvUtility.read_pickle('../data-repository/subject_admission_over.pkl', 'r')
+
+    # item_df = CsvUtility.read_pickle('../data-repository/lab_item_over.pkl', 'r')
+    labtest_list = np.array(pd.read_csv('../data-repository/revert_labtest_dict.csv', index_col=[0], header=None, dtype=str)).flatten()
+    print labtest_list
+    print len(labtest_list)
+    labevent_df = labevent_df[labevent_df['SUBJECT_ID'].isin(np.array(list(sub_df.index), dtype=str)) &
+                              labevent_df['ITEMID'].isin(labtest_list)]
+    # labevent_df['icd9_3'] = [''] * labevent_df.shape[0]
     print labevent_df.shape
     print len(set(list(labevent_df['ITEMID'])))
     return labevent_df
 
 
+# new update:
+# same to labtest, ues the revert_prescription instead of prescription_drug_over, and no more icd9_3
 def get_medication_event():
     medication_df = pd.read_csv(os.path.join(Path, 'PRESCRIPTIONS.csv'))[['SUBJECT_ID', 'HADM_ID', 'STARTDATE', 'DRUG_TYPE', 'FORMULARY_DRUG_CD']]
 
@@ -200,33 +217,34 @@ def get_medication_event():
     medication_df['DRUG_TYPE'] = ['prescription'] * medication_df.shape[0]
     # print medication_df[:5]
     # print medication_df.shape
-    sub_df = CsvUtility.read_pickle('../data-repository/subject_admission_over.pickle', 'r')
-    drug_df = CsvUtility.read_pickle('../data-repository/prescription_drug_over.pickle', 'r')
-    medication_df = medication_df[medication_df['SUBJECT_ID'].isin(list(sub_df.index)) &
-                                  medication_df['FORMULARY_DRUG_CD'].isin(list(drug_df.index))]
-    medication_df ['icd9_3'] = [''] * medication_df.shape[0]
+    sub_df = CsvUtility.read_pickle('../data-repository/subject_admission_over.pkl', 'r')
+    # drug_df = CsvUtility.read_pickle('../data-repository/prescription_drug_over.pkl', 'r')
+    prescription_list = np.array(pd.read_csv('../data-repository/revert_prescription_dict.csv', index_col=[0], header=None, dtype=str)).flatten()
+    medication_df = medication_df[medication_df['SUBJECT_ID'].isin(np.array(list(sub_df.index), dtype=str)) &
+                                  medication_df['FORMULARY_DRUG_CD'].isin(prescription_list)]
+    # medication_df ['icd9_3'] = [''] * medication_df.shape[0]
     print medication_df.shape
     print len(set(list(medication_df['FORMULARY_DRUG_CD'])))
     return medication_df
 
 
 def get_events_together():
-    columns_name = ['hadm_id', 'subject_id', 'charttime', 'event_type', 'event', 'icd9_3']
+    columns_name = ['hadm_id', 'subject_id', 'charttime', 'event_type', 'event']
 
-    diag_columns = ['HADM_ID', 'SUBJECT_ID', 'DISCHTIME', 'DIAGNOSIS', 'ICD9_CODE', 'icd9_3']
+    diag_columns = ['HADM_ID', 'SUBJECT_ID', 'DISCHTIME', 'DIAGNOSIS', 'ICD9_CODE']
     diag_events = get_all_diagnoses_event()
     diag_events = diag_events.ix[:, diag_columns]
     diag_events.columns = columns_name
     print diag_events[:5]
 
     lab_events = get_lab_event()
-    lab_columns = ['HADM_ID', 'SUBJECT_ID', 'CHARTTIME', 'FLAG', 'ITEMID', 'icd9_3']
+    lab_columns = ['HADM_ID', 'SUBJECT_ID', 'CHARTTIME', 'FLAG', 'ITEMID']
     lab_events = lab_events.ix[:, lab_columns]
     lab_events.columns = columns_name
     print lab_events[:5]
 
     medic_events = get_medication_event()
-    medic_columns = ['HADM_ID', 'SUBJECT_ID', 'STARTDATE', 'DRUG_TYPE', 'FORMULARY_DRUG_CD', 'icd9_3']
+    medic_columns = ['HADM_ID', 'SUBJECT_ID', 'STARTDATE', 'DRUG_TYPE', 'FORMULARY_DRUG_CD']
     medic_events = medic_events.ix[:, medic_columns]
     medic_events.columns = columns_name
     print medic_events[:5]
@@ -236,9 +254,10 @@ def get_events_together():
     print all_events[-5:]
     print all_events.shape
 
-    CsvUtility.write2pickle('../data-repository/allevents.pickle', all_events, 'w')
 
-    # all_events = CsvUtility.read_pickle('../data-repository/allevents.pickle', 'r')
+    CsvUtility.write2pickle('../data-repository/allevents.pkl', all_events, 'w')
+
+    # all_events = CsvUtility.read_pickle('../data-repository/allevents.pkl', 'r')
     # print all_events.shape
     # all_events = all_events[all_events['event'] != '']
     # print all_events.shape
@@ -246,8 +265,9 @@ def get_events_together():
     # print all_events.shape
 
 
+# this filter is also useless, and the final events data is allevents.
 def filter_all_event():
-    all_events_df = CsvUtility.read_pickle('../data-repository/allevents.pickle', 'r')
+    all_events_df = CsvUtility.read_pickle('../data-repository/allevents.pkl', 'r')
     all_events_df['icd9_3'] = ''
     print all_events_df[:5]
     print all_events_df.shape
@@ -270,7 +290,7 @@ def filter_all_event():
     # all_events_df.index = np.array(range(all_events_df.shape[0]))
     print all_events_df[:5]
     print all_events_df.shape
-    CsvUtility.write2pickle('../data-repository/all_events_icd9.pickle', all_events_df, 'w')
+    CsvUtility.write2pickle('../data-repository/all_events_icd9.pkl', all_events_df, 'w')
 
 
 if __name__ == '__main__':
@@ -296,9 +316,13 @@ if __name__ == '__main__':
     # get_drug_over('PRESCRIPTIONS.csv', 10)
     # print "============================================================================="
     # get_all_diagnoses_event()
-    get_lab_event()
+    # get_lab_event()
     # get_medication_event()
     # get_events_together()
+    all_events = CsvUtility.read_pickle('../data-repository/allevents.pkl', 'r')
+    for i in all_events.ix[0, :]:
+        print i
+        print type(i)
     # filter_all_event()
     print '******************************************************************************'
 # est code
