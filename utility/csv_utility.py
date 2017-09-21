@@ -62,6 +62,21 @@ class CsvUtility(object):
         pd.DataFrame.from_dict(raw_dict, orient='index').to_csv(os.path.join(csv_path, file_name), header=False)
 
     @staticmethod
+    def write_key_value_times(raw_dict, csv_path, file_name):
+        try:
+            os.makedirs(os.path.join(csv_path, file_name))
+        except Exception:
+            pass
+        with open(os.path.join(csv_path, file_name), 'w') as f:
+            write_str = ""
+            for (key, value) in raw_dict.items():
+                for i in range(value):
+                    write_str += key+","
+            f.write(write_str)
+        return len(raw_dict)
+
+
+    @staticmethod
     def write_array2csv(raw_array, csv_path, file_name, type='float'):
         np_raw = np.array(raw_array)
         # print np_raw.shape
@@ -85,8 +100,8 @@ if __name__ == '__main__':
     # a = np.random.permutation(10)
     # print b[a]
     # print a
-    CsvUtility.write_array2csv(np.array(b), '../data-repository', 'test_csvutility.csv')
-    re_a = CsvUtility.read_array_from_csv('../data-repository', 'test_csvutility.csv')
-    print re_a
-    print re_a.shape
+    # CsvUtility.write_array2csv(np.array(b), '../data-repository', 'test_csvutility.csv')
+    # re_a = CsvUtility.read_array_from_csv('../data-repository', 'test_csvutility.csv')
+    # print re_a
+    # print re_a.shape
     # print b[re_a]

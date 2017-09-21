@@ -37,6 +37,9 @@ def get_instance(time_before_diag = 90):
     print all_events.dtypes
     # all_events = all_events.astype({'hadm_id': 'int64'})
     # print all_events.dtypes
+    all_events['subject_id'] = all_events['subject_id'].astype('int64')
+    for rr in all_events.ix[0, :]:
+        print type(rr)
     print 'sorting ......'
     all_events.sort_values(by=['subject_id', 'charttime', 'event_type', 'event'],  inplace=True)
     print all_events[:10]
@@ -90,7 +93,11 @@ def get_instance(time_before_diag = 90):
                 # for i_pos in range(start_position, len(event_days)):
                 #     t_event_seq.append(event_seq[i_pos])
                     # unique_events.add(event_seq[i_pos])
-                t_event_seq += event_seq[start_position:len(event_days)]
+                t_event_seq += event_seq[start_position:]
+                # print len(event_seq[start_position:])
+                # for test_event in event_seq[start_position:]:
+                #     if test_event.startswith("p_"):
+                #         print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
                 # for item in temp_event_seq:
                 #     # t_event_seq.append(item)
                 #     unique_events.add(item)
@@ -131,13 +138,13 @@ def get_instance(time_before_diag = 90):
     after_del_sequence = []
     for instance in all_seq:
         fil_diag = [diag for diag in instance[-1] if diag in predicted_diags]
-        if len(fil_diag) > 0:
-            for item in instance[0]:
-                unique_events.add(item)
-            after_del_sequence.append(instance)
-            after_del_sequence[-1][-1] = fil_diag
-            for diag in fil_diag:
-                unique_events.add(diag)
+        # if len(fil_diag) > 0:
+        for item in instance[0]:
+            unique_events.add(item)
+        after_del_sequence.append(instance)
+        after_del_sequence[-1][-1] = fil_diag
+        for diag in fil_diag:
+            unique_events.add(diag)
     print 'after limit the predict diagnoses, num of seq: ', len(after_del_sequence)
     print 'max/min of seq: ', seq_max, seq_min
     print 'number of unique items:', len(unique_events)

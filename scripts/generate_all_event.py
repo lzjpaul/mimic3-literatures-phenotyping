@@ -318,7 +318,7 @@ if __name__ == '__main__':
     # get_all_diagnoses_event()
     # get_lab_event()
     # get_medication_event()
-    # get_events_together()
+    get_events_together()
     all_events = CsvUtility.read_pickle('../data-repository/allevents.pkl', 'r')
     for i in all_events.ix[0, :]:
         print i
