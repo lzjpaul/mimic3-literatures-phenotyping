@@ -285,8 +285,12 @@ def get_revert_diagnoses_procedures():
     with open("../data-repository/revert_ICD_word_dict.csv", 'w') as w:
             for (key, value) in sorted(word_count.items(), key=lambda s: s[1], reverse=True):
                 w.write(key + "," + str(value) + "\n")
-#test the method
 
+def show_df(df, num=5):
+    print df[:num]
+    print 'shpe: ', df.shape
+
+#test the method
 def get_final_word_dict():
     MIMIC_word_dict = list(CsvUtility.read_pickle('../data-repository/event_instance_dict.pkl', 'r'))
     print MIMIC_word_dict[:10]
@@ -295,6 +299,7 @@ def get_final_word_dict():
     lab_num = 0
     drug_num = 0
     other_num = 0
+    new_MIMIC_dict = {}
 
     for item in MIMIC_word_dict:
         if item.startswith("d_"):
@@ -306,9 +311,42 @@ def get_final_word_dict():
         else:
             other_num += 1
             print item
+        new_MIMIC_dict[item[2:]] = item
+    new_MIMIC_dict_df = pd.DataFrame.from_dict(dict(new_MIMIC_dict), orient='index')
+    show_df(new_MIMIC_dict_df, 10)
 
     print 'diagnoses number :', diag_num, 'labtest number:', lab_num,'drug number:', drug_num,'other number:', other_num
 
+    revert_diag_proce_df = pd.read_csv('../data-repository/revert_diagnoses_procedures.csv', header=None, dtype=str)
+    revert_labtest_df = pd.read_csv('../data-repository/revert_labtest_dict.csv', header=None, dtype=str)
+    revert_prescrip_df = pd.read_csv('../data-repository/revert_prescription_dict.csv', header=None, dtype=str)
+
+    show_df(revert_diag_proce_df, 10)
+    show_df(revert_labtest_df, 10)
+    show_df(revert_prescrip_df, 10)
+
+    concat_dict = pd.concat([revert_diag_proce_df, revert_labtest_df, revert_prescrip_df], axis=0, ignore_index=True)
+    show_df(concat_dict, 20)
+    concat_dict.set_index(keys=[1], inplace=True)
+    show_df(concat_dict, 10)
+    print len(set(list(concat_dict.index)))
+
+    merge_df = pd.merge(new_MIMIC_dict_df, concat_dict, how='left', left_index=True, right_index=True)
+    show_df(merge_df, 10)
+
+    print len(set(list(merge_df.index)))
+    print len(merge_df['0_x'].unique())
+    print len(merge_df['0_y'].unique())
+
+    merge_df.drop_duplicates()
+    show_df(merge_df)
+    merge_df.to_csv('../data-repository/entity_dict.csv', header=None, index=None)
+    # here we get :
+    # from mimic : diagnoses number : 3208 labtest number: 174 drug number: 749 other number: 220
+    # from revert descriptions we get diagnoses number : 4356 labtest number: 174 drug number: 1434
+    # Problem 1: here exist the maps from one CODE to multiple DESCRIPTIONS, that is allowed
+    # After merge here also exist multiple CODE map to ONE CODE
+    # In the end, we get 4350 words, and 5163 descriptions
 
 if __name__ == '__main__':
     get_final_word_dict()
