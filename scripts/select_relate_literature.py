@@ -2,10 +2,12 @@
 # coding=utf-8
 import os
 import sys
+import nltk.data
 import pandas as pd
 import numpy as np
 import argparse
 from time import clock
+
 
 sys.path.append(os.path.split(os.path.abspath(os.path.dirname(__file__)))[0])
 
@@ -50,9 +52,8 @@ class Doc2WordList(object):
     #         if key in entity_set:
     #             self.entity_count[key] = value
 
-    def doc2sentences(self, rows_text):
-        sentences_list = CsvUtility.text2sentence(raw_text=rows_text, stop_words=self.stop_word,
-                                                  stem_word=False)
+    def doc2sentences(self, rows_text, token):
+        sentences_list = CsvUtility.text2sentence(raw_text=rows_text, token=token, stop_words=self.stop_word, stem_word=False)
         # for sentence in sentences_list:
         #     for word in sentence:
         #         self.word_count[word] = self.word_count[word] + 1 if word in self.word_count else 1
@@ -67,7 +68,7 @@ class Doc2WordList(object):
                     self.entity_count[entity_key] = self.entity_count[entity_key]+1 if entity_key in self.entity_count else 1
 
     def write_filtered_file(self):
-        return CsvUtility.write_key_value_times(self.entity_count, self.out_filter_file_path, "F_"+os.path.basename(self.doc_path))
+        return CsvUtility.write_key_value_times(self.entity_count, self.out_filter_file_path, 'F_'+os.path.basename(self.doc_path))
 
 
 if __name__ == '__main__':
@@ -87,12 +88,13 @@ if __name__ == '__main__':
 
     # use the maps of entity and ICD code to filter the document
     entity_df = pd.read_csv(os.path.join(args.output_path, args.entity_file), header=None)
+    # entity_df = pd.read_csv(args.output_path+args.entity_file, header=None)
     print "entity map:"
     print entity_df[:5]
 
     entity_map = {}
     for i in range(entity_df.shape[0]):
-        assert entity_df.ix[i, 1] not in entity_map
+        # assert entity_df.ix[i, 1] not in entity_map
         entity_map[entity_df.ix[i, 1]] = entity_df.ix[i, 0]
 
     # print 'entity size :', len(entity_list)
@@ -106,11 +108,18 @@ if __name__ == '__main__':
     doc2entity = {}
     i_count = 0
     start_time = clock()
+    # use the NLTK tokenizer to split the paragraph into sentences
+    tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
     for file_path in file_path_list:
+        print file_path
         doc2word_list = Doc2WordList(doc_path=file_path, output_filter_file_path=args.out_filter_file_path, stop_word=[])
+        print 'step 1'
         doc_text = doc2word_list.get_text()
-        sentence_list = doc2word_list.doc2sentences(doc_text)
+        print 'step 2'
+        sentence_list = doc2word_list.doc2sentences(doc_text, tokenizer)
+        print 'step 3'
         doc2word_list.find_entity_map(entity_map=entity_map, sentences_list=sentence_list)
+        print 'step 4'
         # for (key, value) in doc2word_list.word_count.items():
         #     vocabulary_count[key] = vocabulary_count[key]+value if key in vocabulary_count else value
         for (key, value) in doc2word_list.entity_count.items():
@@ -121,6 +130,7 @@ if __name__ == '__main__':
                                     str(len(doc2word_list.entity_count.items()))
             # for key_entity in doc2word_list.entity_count.keys():
             #     doc2entity[file_path] = doc2entity[file_path] + "," + key_entity
+            print 'write..'
             doc2word_list.write_filtered_file()
         i_count += 1
         if i_count % 5 == 0:
@@ -140,4 +150,4 @@ if __name__ == '__main__':
     print '******************************************************************************'
 #test code
 
-#python select_relate_literature.py '../data-repository/BMC_Musuloskelet_Disord' '../data-repository' '../new_literature' 'merge_diagnoses_word_dict.csv'
+#python select_relate_literature.py ../data-repository/literature_doc ../data-repository ../data-repository/new_literature entity_dict.csv

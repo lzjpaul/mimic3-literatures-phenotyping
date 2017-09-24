@@ -28,12 +28,13 @@ class CsvUtility(object):
         return words
 
     @staticmethod
-    def text2sentence(raw_text, stop_words=[], stem_word=False):
+    def text2sentence(raw_text, token, stop_words=[], stem_word=False):
 
         # use the NLTK tokenizer to split the paragraph into sentences
-        tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+        # for saving time, delete the token here
+        # tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
-        raw_sentences = tokenizer.tokenize(raw_text.decode('utf8').strip())
+        raw_sentences = token.tokenize(raw_text.decode('utf8').strip())
 
         # loop over each sentence
         sentences = []
@@ -63,11 +64,11 @@ class CsvUtility(object):
 
     @staticmethod
     def write_key_value_times(raw_dict, csv_path, file_name):
-        try:
-            os.makedirs(os.path.join(csv_path, file_name))
-        except Exception:
-            pass
-        with open(os.path.join(csv_path, file_name), 'w') as f:
+        # try:
+        #     os.makedirs(os.path.join(csv_path, file_name))
+        # except Exception:
+        #     pass
+        with open(csv_path+'/'+file_name, 'w') as f:
             write_str = ""
             for (key, value) in raw_dict.items():
                 for i in range(value):

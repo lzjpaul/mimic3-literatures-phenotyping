@@ -75,25 +75,25 @@ tmp = "34-Mg"
 from  utility.csv_utility import CsvUtility
 from utility.directory_utility import Directory
 
-print 'reading.....'
-all_events = CsvUtility.read_pickle('../data-repository/allevents.pkl', 'r')
-print all_events.shape
-all_events.dropna(axis=0, how='any', inplace=True)
-print all_events.shape
-print 'changing the order......'
-all_events = all_events.ix[:, ['subject_id', 'charttime', 'event_type', 'event', 'hadm_id']]
-print all_events.dtypes
-all_events['subject_id'] = all_events['subject_id'].astype('int64')
-
-for rr in all_events.ix[0, :]:
-    print type(rr)
-
-# all_events = all_events.astype({'hadm_id': 'int64'})
+# print 'reading.....'
+# all_events = CsvUtility.read_pickle('../data-repository/allevents.pkl', 'r')
+# print all_events.shape
+# all_events.dropna(axis=0, how='any', inplace=True)
+# print all_events.shape
+# print 'changing the order......'
+# all_events = all_events.ix[:, ['subject_id', 'charttime', 'event_type', 'event', 'hadm_id']]
 # print all_events.dtypes
-print 'sorting ......'
-all_events.sort_values(by=['subject_id', 'charttime', 'event_type', 'event'], inplace=True)
-print all_events[:10]
-all_events.to_csv('../data-repository/test_all_events.csv', index=None, header=None)
+# all_events['subject_id'] = all_events['subject_id'].astype('int64')
+#
+# for rr in all_events.ix[0, :]:
+#     print type(rr)
+#
+# # all_events = all_events.astype({'hadm_id': 'int64'})
+# # print all_events.dtypes
+# print 'sorting ......'
+# all_events.sort_values(by=['subject_id', 'charttime', 'event_type', 'event'], inplace=True)
+# print all_events[:10]
+# all_events.to_csv('../data-repository/test_all_events.csv', index=None, header=None)
 
 # a = pd.DataFrame([['1', '2', '2', '5'],
 #                  ['11', '22', '2', '5'],
@@ -103,3 +103,9 @@ all_events.to_csv('../data-repository/test_all_events.csv', index=None, header=N
 # print a
 # a.sort_values(by=[0,1,2], inplace=True)
 # print a
+import os
+
+with open('../new_literature/F_Adv_Healthc_Mater_2012_Sep_12_1(5)_640-645.txt', 'w') as f:
+    write_str = "hello."
+
+    f.write(write_str)
