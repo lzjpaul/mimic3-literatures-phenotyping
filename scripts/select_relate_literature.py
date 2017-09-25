@@ -106,6 +106,7 @@ if __name__ == '__main__':
     # vocabulary_count = {}
     used_entity_count = {}
     doc2entity = {}
+    new_docs = []
     i_count = 0
     start_time = clock()
     # use the NLTK tokenizer to split the paragraph into sentences
@@ -130,8 +131,15 @@ if __name__ == '__main__':
                                     str(len(doc2word_list.entity_count.items()))
             # for key_entity in doc2word_list.entity_count.keys():
             #     doc2entity[file_path] = doc2entity[file_path] + "," + key_entity
-            print 'write..'
-            doc2word_list.write_filtered_file()
+            # do not write the new file every time, write in one file
+            # print 'write..'
+            # doc2word_list.write_filtered_file()
+            # combine the contend together and write once
+            new_literature = ""
+            for (key, value) in doc2word_list.entity_count.items():
+                for i in range(value):
+                    new_literature += key+","
+            new_docs.append(new_literature)
         i_count += 1
         if i_count % 5 == 0:
             end_time = clock()
@@ -147,6 +155,7 @@ if __name__ == '__main__':
                               file_name='used_entity.csv')
     CsvUtility.write_dict2csv(raw_dict=doc2entity, csv_path=args.output_path,
                               file_name='doc2entity.csv')
+    CsvUtility.write_list2csv(new_docs, csv_path=args.out_filter_file_path, file_name='new_docs.csv')
     print '******************************************************************************'
 #test code
 

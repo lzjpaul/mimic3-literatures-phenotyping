@@ -94,10 +94,18 @@ class CsvUtility(object):
             return re_array.flatten()
         return re_array
 
+    @staticmethod
+    def write_list2csv(list_data, csv_path, file_name):
+        with open(os.path.join(csv_path, file_name), 'w') as f:
+            for item in list_data:
+                f.write(item)
+                f.write('\n')
+
 if __name__ == '__main__':
 
-    b = np.random.rand(10,5)
-    print b
+    tests = ["dd", "df3ef", "dfeww"]
+    print tests
+    CsvUtility.write_list2csv(tests, '../data-repository', 'test_csvutility.csv')
     # a = np.random.permutation(10)
     # print b[a]
     # print a
