@@ -3,6 +3,7 @@ import re
 import os
 import shutil
 import time
+import argparse
 
 def split_literature(literature_path, doc_num_per_file, original_file, file_base_name):
     file_path_list = []
@@ -30,4 +31,11 @@ def split_literature(literature_path, doc_num_per_file, original_file, file_base
 
 if __name__ == '__main__':
     # shutil.move('E:\githubWorkSpace\mimic3-literatures-phenotyping\data-repository\DC_3D11.txt', 'E:\githubWorkSpace\mimic3-literatures-phenotyping\data-repository/new_literature')
-    split_literature('../data-repository/literature_doc', 10, '../data-repository/file_split', 'literature')
+    parser = argparse.ArgumentParser(description='splite the literatures into certain docs per file')
+    parser.add_argument('literature_path', type=str, help='The path of literature')
+    parser.add_argument('docs_num_per_file', type=int, help='The number of docs you want put in every file')
+    parser.add_argument('splite_path', type=str, help='The path of split result')
+    parser.add_argument('orginal_file_name', type=str, help='The name of split file')
+    args, _ = parser.parse_known_args()
+
+    split_literature(args.literature_path, args.docs_num_per_file, args.splite_path, args.original_file_name)
