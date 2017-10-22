@@ -3,15 +3,17 @@ import pandas as pd
 import numpy as np
 from pprint import pprint
 
+from utility.csv_utility import CsvUtility
+
 
 def process_lda(docs_path, topic_num):
     selected_docs = pd.read_csv(docs_path, header=None, index_col=[0]).values
-    print selected_docs.shape
+    print 'number of docs:', selected_docs.shape
     # print selected_docs[:5]
     texts = [[word for word in doc[0].split(' ')] for doc in selected_docs]
     # pprint(texts[:5])
     dictionary = corpora.Dictionary(texts)
-    dictionary.save('../data-repository/available_word_in_literature.dict')
+    dictionary.save_as_text('../data-repository/available_word_in_literature.csv')
     print dictionary
     # print dictionary.token2id
     corpus = [dictionary.doc2bow(text) for text in texts]
@@ -19,7 +21,10 @@ def process_lda(docs_path, topic_num):
     print len(corpus)
     lda_model = models.LdaModel(corpus, id2word=dictionary, num_topics=topic_num, update_every=1, chunksize=1000, passes=1)
 
-    lda_model.print_topics(10, 10)
+    # lda_model.print_topics(10, 10)
+    gamma = lda_model.get_topics()
+    print "shape of gamma :", gamma.shape
+    CsvUtility.write_array2csv(gamma, '../data-repository', 'gamma_from_LDA.csv')
     return lda_model.show_topics(10, 10)
 
 

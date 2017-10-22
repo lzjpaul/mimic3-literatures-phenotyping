@@ -4,7 +4,8 @@ import nltk
 import nltk.data
 import pandas as pd
 import os
-import cPickle as pickle
+import cPickle as CPickle
+import pickle
 import numpy as np
 
 
@@ -48,13 +49,13 @@ class CsvUtility(object):
     @staticmethod
     def write2pickle(file_path, object, type):
         with open(file_path, type) as f:
-            pickle.dump(object, f)
+            CPickle.dump(object, f)
             f.close()
 
     @staticmethod
     def read_pickle(file_path, type):
         with open(file_path, type) as f:
-            obj = pickle.load(f)
+            obj = CPickle.load(f)
             f.close()
         return obj
 
@@ -105,7 +106,8 @@ if __name__ == '__main__':
 
     tests = ["dd", "df3ef", "dfeww"]
     print tests
-    CsvUtility.write_list2csv(tests, '../data-repository', 'test_csvutility.csv')
+    CsvUtility.write2pickle('../data-repository/123.pkl', tests, 'w')
+    # CsvUtility.write_list2csv(tests, '../data-repository', 'test_csvutility.csv')
     # a = np.random.permutation(10)
     # print b[a]
     # print a
@@ -114,3 +116,5 @@ if __name__ == '__main__':
     # print re_a
     # print re_a.shape
     # print b[re_a]
+    word_dict = CsvUtility.read_pickle('../data-repository/event_dict.pickle', 'r')
+    print word_dict
