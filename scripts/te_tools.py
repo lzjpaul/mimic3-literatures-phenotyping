@@ -52,7 +52,7 @@ import datetime
 # print a.isalpha()
 # print a
 # print a[:-1]
-tmp = "34-Mg"
+# tmp = "34-Mg"
 # print tmp.endswith("mg")
 # print tmp[:-2].isdigit()
 # if tmp.endswith("mg") and len(tmp) > 2 and tmp[:-2].isdigit():
@@ -110,29 +110,70 @@ import os
 #
 #     f.write(write_str)
 #Example #1: sum_primes.py
-
-# gamma_data = pd.read_csv('../data-repository/gamma_from_LDA.csv',
-#                          index_col=None, header=None)
-# print gamma_data.shape
 '''
-id2word = {}
+gamma_data = np.array(pd.read_csv('../data-repository/gamma_from_LDA.csv',
+                         index_col=None, header=None)).T
+print gamma_data.shape
+print gamma_data[:20]
+
+gamma_id2word = {}
 with open('../data-repository/available_word_in_literature.csv') as file:
     line_num = file.readline()
-    print line_num
+    # print line_num
     lines_contend = file.readlines()
     for line_n in lines_contend:
         line = line_n.split("\t")
-        print line
+        # print line
         if len(line) > 1:
-            id2word[int(line[0])] = line[1]
-print len(id2word)
-print id2word.keys()
-id_list = id2word.keys()
+            gamma_id2word[int(line[0])] = line[1]
+print len(gamma_id2word)
+id_list = gamma_id2word.keys()
 print np.array(id_list).max()
 
-list2 = ['123', 'xyz', 'zara', 'abc', 12]
-print max(list2)
-'''
 
-word_dict = CsvUtility.read_pickle('../data-repository/event_instance_dict.pkl', 'r')
-print word_dict
+feature_index = pd.read_csv('../data-repository/feature2index.csv',
+                            header=None, index_col=None)
+print feature_index.shape
+print feature_index[:5]
+f_i = np.array(feature_index)
+print f_i.shape, f_i[:, 1].max()
+
+feature_word2id = {}
+# np.zeros((feature_index.shape[0], gamma_data.shape[1]))
+for i in range(f_i.shape[0]):
+    feature_word2id[f_i[i][0]] = int(f_i[i][1])
+print len(feature_word2id)
+
+change_index_result = np.zeros((feature_index.shape[0],
+                                gamma_data.shape[1]))
+for i in range(gamma_data.shape[0]):
+    new_index = feature_word2id[gamma_id2word[i]]
+    for j in range(gamma_data.shape[1]):
+        change_index_result[new_index][j] += gamma_data[i][j]
+    if i%1000 == 0:
+        print i, 'line'
+print change_index_result[:5]
+print change_index_result.shape
+''''''
+import torch
+from torch.autograd import Variable
+gamma_test = -1*Variable(torch.from_numpy(np.random.rand(3, 6)))
+para_test = Variable(torch.from_numpy(np.random.rand(6, 4)))
+print gamma_test
+print gamma_test.abs()
+print (gamma_test.abs().sum(dim=1).view(-1, 1))
+print (gamma_test.abs()) / (gamma_test.abs().sum(dim=1).view(-1, 1))
+
+
+print para_test
+mum = gamma_test.abs().mm(para_test)
+print mum
+print 'max: '
+max = mum.max(dim=1)[0]
+print max
+sum = max.sum()
+print sum
+re = Variable(torch.DoubleTensor([1.0]))/sum
+print re
+'''
+print [0]*5

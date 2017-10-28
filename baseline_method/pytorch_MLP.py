@@ -5,6 +5,7 @@ import torch.utils.data as Data
 from gensim import corpora, models
 import numpy as np
 import pandas as pd
+from pprint import pprint
 
 from utility.csv_utility import CsvUtility
 from baseline_method.load_data import load_corpus, reload_corpus
@@ -16,7 +17,7 @@ class Net(nn.Module):
         super(Net, self).__init__()
         self.fc1 = nn.Linear(input_size, hidden_size, bias=True)
         self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(hidden_size, num_classes, bias=True,)
+        self.fc2 = nn.Linear(hidden_size, num_classes, bias=True)
 
     def forward(self, x):
         out = self.fc1(x)
@@ -25,11 +26,11 @@ class Net(nn.Module):
         #out = self.relu(out)
         return out
 
-def mlp_lda():
+def mlp_lda(gamma=np.array([]), penalty_rate=100):
 
     # Mimic Dataset
     print 'loading data...'
-    train_x, train_y, test_x, test_y, idx = load_corpus()
+    train_x, train_y, test_x, test_y, idx = reload_corpus()
     print 'loading ready...'
     print 'shape of train x:', train_x.shape
     print 'shape of train y:', train_y.shape
@@ -41,7 +42,7 @@ def mlp_lda():
     hidden_size = 100
     num_classes = 80
     num_epochs = 1
-    batchsize = 10
+    batchsize = 5
     learning_rate = 0.001
 
     net = Net(input_size, hidden_size, num_classes)
@@ -52,6 +53,7 @@ def mlp_lda():
     print 'parameter size :'
     for para in net.parameters():
         print para.size()
+        # print para
 
 
     train_dataset = Data.TensorDataset(data_tensor=torch.from_numpy(train_x),
@@ -77,10 +79,24 @@ def mlp_lda():
             inputs = Variable(input_train_x).float()
             targets = Variable(input_train_y).float()
 
+            # get loss from gamma with lda model
+            penalty = Variable(torch.FloatTensor([0.0]))
+            gammas = Variable(torch.from_numpy(gamma)).float()
+            for para_iter, para in enumerate(net.parameters()):
+                if para_iter == 0:
+                    latent_neuron_topics = para.abs().mm(gammas)
+                    # print 'latent_neuron_topics : ', latent_neuron_topics
+                    latent_neuron_topics = latent_neuron_topics / (latent_neuron_topics.sum(dim=1).view(-1, 1))
+                    # print 'Norm latent_neuron_topics : ', latent_neuron_topics
+                    penalty = Variable(torch.FloatTensor([1.0]))/(latent_neuron_topics.max(dim=1)[0].sum())
+
             # Forward + Backward + Optimize
             optimizer.zero_grad()  # zero the gradient buffer
             outputs = net(inputs)
             loss = criterion(outputs, targets)
+            # print 'criterion loss : ', loss
+            loss = loss + penalty_rate * penalty
+            # print 'penalty loss : ', (penalty_rate * penalty).data.numpy()
             loss.backward()
             optimizer.step()
 
@@ -106,13 +122,7 @@ def mlp_lda():
         targets = Variable(input_test_y).float()
         # _, predicted = torch.max(outputs.data, 1)
         predicted = outputs.data
-        # total += labels.size(0)
-        # print outputs.data
-        # print predicted.numpy().shape
-        # print targets
-        # minus = predicted.numpy()-input_test_y
-        # t_loss = minus.T.dot(minus).sum()
-        # t_loss = t_loss / (minus.shape[0]*minus.shape[1])
+
         st_loss = criterion(outputs, targets)
         test_loss += st_loss.data[0]/num_classes
         test_count += 1
@@ -151,15 +161,64 @@ def get_gamma_lda(docs_path, topic_num):
     # print dictionary.token2id
     corpus = [dictionary.doc2bow(text) for text in texts]
     # print corpus[:5]
-    print len(corpus)
+    # print len(corpus)
     lda_model = models.LdaModel(corpus, id2word=dictionary, num_topics=topic_num,
                                 update_every=1, chunksize=1000, passes=1)
 
     # lda_model.print_topics(10, 10)
-    gamma = lda_model.get_topics()
+    # gamma = lda_model.get_topics().T
+    gamma = lda_model.state.get_lambda()
+    gamma = (gamma / gamma.sum(axis=0)).T
     print "shape of gamma :", gamma.shape
     CsvUtility.write_array2csv(gamma, '../data-repository', 'gamma_from_LDA.csv')
-    return lda_model.show_topics(10, 10)
+    pprint(lda_model.show_topics(10, 10))
+
+    # change the gamma, because the number of word is less than the number of feature
+    # then insert zeros to change the size of gamma into bigger gamma with the same size
+    # of (feature_size, topic_number)
+
+    gamma_id2word = {}
+    with open('../data-repository/available_word_in_literature.csv') as file:
+        line_num = file.readline()
+        # print line_num
+        lines_contend = file.readlines()
+        for line_n in lines_contend:
+            line = line_n.split("\t")
+            # print line
+            if len(line) > 1:
+                gamma_id2word[int(line[0])] = line[1]
+    print 'original gamma size: ', len(gamma_id2word)
+    id_list = gamma_id2word.keys()
+    # print np.array(id_list).max()
+
+    feature_word2id = {}
+    feature_index = pd.read_csv('../data-repository/feature2index.csv',
+                                header=None, index_col=None)
+    # print feature_index.shape
+    # print feature_index[:5]
+    f_i = np.array(feature_index)
+    # print f_i.shape, f_i[:, 1].max()
+
+    # np.zeros((feature_index.shape[0], gamma_data.shape[1]))
+    for i in range(f_i.shape[0]):
+        feature_word2id[f_i[i][0]] = int(f_i[i][1])
+    print 'new feature size: ', len(feature_word2id)
+
+    change_index_result = np.zeros((feature_index.shape[0], gamma.shape[1]))
+    for i in range(gamma.shape[0]):
+        new_index = feature_word2id[gamma_id2word[i]]
+        for j in range(gamma.shape[1]):
+            change_index_result[new_index][j] += gamma[i][j]
+        if i % 1000 == 0:
+            print i, 'line'
+    print change_index_result[:5]
+    print 'after changing the size of result: ', change_index_result.shape
+    CsvUtility.write_array2csv(change_index_result, '../data-repository',
+                               'gamma_result.csv')
+    return change_index_result
 
 if __name__ == '__main__':
-    mlp_lda()
+
+    #gamma_data = get_gamma_lda('../data-repository/selected_docs4LDA.csv', 20)
+    gamma_data = CsvUtility.read_array_from_csv('../data-repository', 'gamma_result.csv')
+    mlp_lda(gamma=gamma_data, penalty_rate=1000)
