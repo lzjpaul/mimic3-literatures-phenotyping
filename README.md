@@ -20,8 +20,9 @@ Original experimental code of the model which combines LDA with MLP
     * /scripts/generate_instance.py  
     Retrieve the instances from event sequences. Every instance includes diagnoses of one bill and all events in 90 days before the bill. The predictive task is to predict the diagnoses in the bill.
      
-2. **Medical articles preprocessing for trianing LDA**   
-    * /scripts/select_relate_literature.py  
+2. **Medical articles preprocessing for training LDA**
+    * /scripts/select_relate_literature.py
+    This is python version of preprocessing, and it's very slow. So using java version is better. (https://github.com/lalala16/nlp-task)  
     * /scripts/select_generate_new_docs.py   
     Find the events in medical articles using events' descriptions, replace the articles' content with several events.  
     
