@@ -11,7 +11,8 @@ Original experimental code of the model which combines LDA with MLP
     5. pandas
     6. cPickle
     7. matplotlib
-### Data Preprocessing：
+### Data Preprocessing：  
+     Better create a new file folder named "data-repository" to save the intermediate file.
 1. **MIMICIII data prepeocessing for MLP**  
     * /scripts/generate_all_event.py   
     Retrieve three kind events(diagnoses, labtests, prescriptions) from MIMICIII data. Diagnoses for ICD9_CODE; LabTests for ITEMID; Prescription for FORMULARY_DRUG_CD. Each code must appear several times in datasets.
@@ -22,7 +23,7 @@ Original experimental code of the model which combines LDA with MLP
      
 2. **Medical articles preprocessing for training LDA**
     * /scripts/select_relate_literature.py
-    This is python version of preprocessing, and it's very slow. So using java version is better. (https://github.com/lalala16/nlp-task)  
+    This is python version of preprocessing, and it's very slow. So using java version is better. (https://github.com/lalala16/nlp-task)
     * /scripts/select_generate_new_docs.py   
     Find the events in medical articles using events' descriptions, replace the articles' content with several events.  
     
