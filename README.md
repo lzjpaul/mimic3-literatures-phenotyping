@@ -3,7 +3,14 @@ Original experimental code of the model which combines LDA with MLP
 ### Datasets：
 * MIMICIII data (https://mimic.physionet.org/about/mimic/)
 * PubMed (https://www.ncbi.nlm.nih.gov/pmc/)
-
+### Dependencies：
+    1. gensim
+    2. pytorch
+    3. sklearn
+    4. numpy
+    5. pandas
+    6. cPickle
+    7. matplotlib
 ### Data Preprocessing：
 1. **MIMICIII data prepeocessing for MLP**  
     * /scripts/generate_all_event.py   
@@ -19,6 +26,6 @@ Original experimental code of the model which combines LDA with MLP
     Find the events in medical articles using events' descriptions, replace the article contend by several events.  
     
 ### Models：
-* /baseline_method/pytorch_MLP.py  
+* /baseline_method/pytorch_MLP.py  (not finish...)  
     Combine the LDA with MLP by add the inference result as penalty term to the objective function of MLP.
     
