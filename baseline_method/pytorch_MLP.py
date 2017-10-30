@@ -30,7 +30,7 @@ def mlp_lda(gamma=np.array([]), penalty_rate=100):
 
     # Mimic Dataset
     print 'loading data...'
-    train_x, train_y, test_x, test_y, idx = reload_corpus()
+    train_x, train_y, test_x, test_y, idx = load_corpus()
     print 'loading ready...'
     print 'shape of train x:', train_x.shape
     print 'shape of train y:', train_y.shape
