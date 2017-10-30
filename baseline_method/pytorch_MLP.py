@@ -79,16 +79,8 @@ def mlp_lda(gamma=np.array([]), penalty_rate=100):
             inputs = Variable(input_train_x).float()
             targets = Variable(input_train_y).float()
 
-            # get loss from gamma with lda model
-            penalty = Variable(torch.FloatTensor([0.0]))
-            gammas = Variable(torch.from_numpy(gamma)).float()
-            for para_iter, para in enumerate(net.parameters()):
-                if para_iter == 0:
-                    latent_neuron_topics = para.abs().mm(gammas)
-                    # print 'latent_neuron_topics : ', latent_neuron_topics
-                    latent_neuron_topics = latent_neuron_topics / (latent_neuron_topics.sum(dim=1).view(-1, 1))
-                    # print 'Norm latent_neuron_topics : ', latent_neuron_topics
-                    penalty = Variable(torch.FloatTensor([1.0]))/(latent_neuron_topics.max(dim=1)[0].sum())
+            # get the penalty from lda model
+            penalty = get_simple_inference_penalty(net, gamma)
 
             # Forward + Backward + Optimize
             optimizer.zero_grad()  # zero the gradient buffer
@@ -148,6 +140,22 @@ def mlp_lda(gamma=np.array([]), penalty_rate=100):
 
     # Save the Model
     # torch.save(net.state_dict(), 'model.pkl')
+
+
+def get_simple_inference_penalty(net, gamma):
+    # get loss from gamma with lda model
+    penalty = Variable(torch.FloatTensor([0.0]))
+    gammas = Variable(torch.from_numpy(gamma)).float()
+    for para_iter, para in enumerate(net.parameters()):
+        if para_iter == 0:
+            latent_neuron_topics = para.abs().mm(gammas)
+            # print 'latent_neuron_topics : ', latent_neuron_topics
+            latent_neuron_topics = latent_neuron_topics / (latent_neuron_topics.sum(dim=1).view(-1, 1))
+            # print 'Norm latent_neuron_topics : ', latent_neuron_topics
+            penalty = Variable(torch.FloatTensor([1.0])) / (latent_neuron_topics.max(dim=1)[0].sum())
+
+    return penalty
+
 
 def get_gamma_lda(docs_path, topic_num):
     selected_docs = pd.read_csv(docs_path, header=None, index_col=[0]).values
@@ -216,6 +224,7 @@ def get_gamma_lda(docs_path, topic_num):
     CsvUtility.write_array2csv(change_index_result, '../data-repository',
                                'gamma_result.csv')
     return change_index_result
+
 
 if __name__ == '__main__':
 
