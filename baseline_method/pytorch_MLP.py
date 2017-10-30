@@ -156,6 +156,10 @@ def get_simple_inference_penalty(net, gamma):
 
     return penalty
 
+def get_inference_penalty():
+    # to inference the new doc
+    pass
+
 
 def get_gamma_lda(docs_path, topic_num):
     selected_docs = pd.read_csv(docs_path, header=None, index_col=[0]).values

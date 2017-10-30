@@ -65,7 +65,7 @@ def reload_corpus(all_path='../data-repository/', train_perc=0.7, shuffle=False)
     return x_train[:train_size], y_train[:train_size], x_train[train_size:], y_train[train_size:], idx
 
 if __name__ == '__main__':
-    training_x, training_y, testing_x, testing_y , idx= load_corpus()
+    training_x, training_y, testing_x, testing_y, idx = load_corpus()
     print training_x.shape
     print training_y.shape
     print testing_x.shape
