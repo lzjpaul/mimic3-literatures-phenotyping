@@ -22,7 +22,7 @@ Original experimental code of the model which combines LDA with MLP
      
 2. **Medical articles preprocessing for trianing LDA**   
     * /scripts/select_relate_literature.py  
-      /scripts/select_generate_new_docs.py   
+    * /scripts/select_generate_new_docs.py   
     Find the events in medical articles using events' descriptions, replace the article contend by several events.  
     
 ### Models：
