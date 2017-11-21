@@ -113,7 +113,7 @@ def get_all_diagnoses_event():
     diagnoses_df = pd.concat([diagnoses_df, procedures_df], axis=0)
     print diagnoses_df[:5]
     print diagnoses_df.shape
-    admission_df = pd.read_csv(os.path.join(Path, 'ADMISSIONS.csv'), dtype=str)
+    admission_df = pd.read_csv(os.path.join(Path, 'MIMICIII_data/ADMISSIONS.csv'), dtype=str)
     # print admission_df[:5]
     diagnoses_event = pd.merge(diagnoses_df[['SUBJECT_ID', 'HADM_ID', 'ICD9_CODE']],
                                admission_df[['HADM_ID', 'DISCHTIME', 'DIAGNOSIS']], 'left', on='HADM_ID')
