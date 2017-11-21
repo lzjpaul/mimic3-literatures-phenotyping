@@ -104,7 +104,7 @@ def get_drug_over(file_name, over_num):
 # don not use the merge_diagnoses_dict anymore, because donot limit the ICD code into three, use the full ICD code
 #  add the procedures events
 def get_all_diagnoses_event():
-    diagnoses_df = pd.read_csv(path.join(Path, 'MIMICIIII_data/DIAGNOSES_ICD.csv'), dtype=str)
+    diagnoses_df = pd.read_csv(path.join(Path, 'MIMICIII_data/DIAGNOSES_ICD.csv'), dtype=str)
     procedures_df = pd.read_csv(path.join(Path, 'MIMICIII_data/PROCEDURES_ICD.csv'), dtype=str)
     print procedures_df[:5]
     print procedures_df.shape
@@ -186,7 +186,7 @@ def get_all_diagnoses_event():
 # here lab_item_over is useless, because the revert_labtest_dict already use the "over" to limit the dict
 # don not have icd9_3 anymore
 def get_lab_event():
-    labevent_df = pd.read_csv(os.path.join(Path, 'MIMICIIII_data/LABEVENTS.csv'), dtype=str)[['SUBJECT_ID', 'HADM_ID', 'CHARTTIME', 'ITEMID', 'FLAG']]
+    labevent_df = pd.read_csv(os.path.join(Path, 'MIMICIII_data/LABEVENTS.csv'), dtype=str)[['SUBJECT_ID', 'HADM_ID', 'CHARTTIME', 'ITEMID', 'FLAG']]
     labevent_df = labevent_df[labevent_df['FLAG'] == 'abnormal']
     labevent_df['FLAG']=['labevent'] * labevent_df.shape[0]
     # labevent_df['SUBJECT_ID'] = labevent_df['SUBJECT_ID'].astype('str')
@@ -211,7 +211,7 @@ def get_lab_event():
 # new update:
 # same to labtest, ues the revert_prescription instead of prescription_drug_over, and no more icd9_3
 def get_medication_event():
-    medication_df = pd.read_csv(os.path.join(Path, 'MIMICIIII_data/PRESCRIPTIONS.csv'))[['SUBJECT_ID', 'HADM_ID', 'STARTDATE', 'DRUG_TYPE', 'FORMULARY_DRUG_CD']]
+    medication_df = pd.read_csv(os.path.join(Path, 'MIMICIII_data/PRESCRIPTIONS.csv'))[['SUBJECT_ID', 'HADM_ID', 'STARTDATE', 'DRUG_TYPE', 'FORMULARY_DRUG_CD']]
 
     # print medication_df[:5]
     medication_df['DRUG_TYPE'] = ['prescription'] * medication_df.shape[0]
@@ -308,13 +308,13 @@ if __name__ == '__main__':
     print "prepare the dict of subject(patient), diagnosis, medication, labtest by limit minimal count number"
     subject_admission_over('MIMICIIII_data/ADMISSIONS.csv', 1)
     print "============================================================================="
-    icd_diagnoses_over('MIMICIIII_data/DIAGNOSES_ICD.csv', 5)
+    icd_diagnoses_over('MIMICIII_data/DIAGNOSES_ICD.csv', 5)
     print "============================================================================="
-    icd_procedures_over('MIMICIIII_data/PROCEDURES_ICD.csv', 5)
+    icd_procedures_over('MIMICIII_data/PROCEDURES_ICD.csv', 5)
     print "============================================================================="
-    get_lab_item_over('MIMICIIII_data/LABEVENTS.csv', 10)
+    get_lab_item_over('MIMICIII_data/LABEVENTS.csv', 10)
     print "============================================================================="
-    get_drug_over('MIMICIIII_data/PRESCRIPTIONS.csv', 10)
+    get_drug_over('MIMICIII_data/PRESCRIPTIONS.csv', 10)
     print "============================================================================="
     # get_all_diagnoses_event()
     # get_lab_event()
