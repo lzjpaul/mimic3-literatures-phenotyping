@@ -219,7 +219,7 @@ def get_medication_event():
     # print medication_df.shape
     sub_df = CsvUtility.read_pickle(path.join(Path, 'data-repository/subject_admission_over.pkl'), 'r')
     # drug_df = CsvUtility.read_pickle('../data-repository/prescription_drug_over.pkl', 'r')
-    prescription_list = np.array(pd.read_csv(path.join(Path, '/data-repository/revert_prescription_dict.csv'), index_col=[0], header=None, dtype=str)).flatten()
+    prescription_list = np.array(pd.read_csv(path.join(Path, 'data-repository/revert_prescription_dict.csv'), index_col=[0], header=None, dtype=str)).flatten()
     medication_df = medication_df[medication_df['SUBJECT_ID'].isin(np.array(list(sub_df.index), dtype=str)) &
                                   medication_df['FORMULARY_DRUG_CD'].isin(prescription_list)]
     # medication_df ['icd9_3'] = [''] * medication_df.shape[0]
