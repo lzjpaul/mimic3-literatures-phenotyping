@@ -5,11 +5,14 @@ import cPickle as pickle
 import pandas as pd
 import numpy as np
 from os import path
+import os
+import sys
 import math
 from random import randrange, shuffle
 import json
 import datetime
 from collections import defaultdict
+sys.path.append(os.path.split(os.path.abspath(os.path.dirname(__file__)))[0])
 from utility.csv_utility import CsvUtility
 from utility.nlp_utility import NLP_Utility
 
