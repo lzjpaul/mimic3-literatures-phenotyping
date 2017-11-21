@@ -306,7 +306,7 @@ if __name__ == '__main__':
     #     pass
 
     print "prepare the dict of subject(patient), diagnosis, medication, labtest by limit minimal count number"
-    subject_admission_over('MIMICIIII_data/ADMISSIONS.csv', 1)
+    subject_admission_over('MIMICIII_data/ADMISSIONS.csv', 1)
     print "============================================================================="
     icd_diagnoses_over('MIMICIII_data/DIAGNOSES_ICD.csv', 5)
     print "============================================================================="
