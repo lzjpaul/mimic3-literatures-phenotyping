@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.utils.data as Data
-from gensim import corpora, models
+from gensim import corpora, models, utils, matutils
 import numpy as np
 import pandas as pd
 from pprint import pprint
@@ -10,6 +10,7 @@ from pprint import pprint
 from utility.csv_utility import CsvUtility
 from baseline_method.load_data import load_corpus, reload_corpus
 from baseline_method.compute_accurency import get_macro_micro_auc, get_auc_list
+
 
 # Neural Network Model (1 hidden layer)
 class Net(nn.Module):
@@ -26,7 +27,8 @@ class Net(nn.Module):
         #out = self.relu(out)
         return out
 
-def mlp_lda(gamma=np.array([]), penalty_rate=100):
+
+def mlp_lda(penalty_rate=100):
 
     # Mimic Dataset
     print 'loading data...'
@@ -39,11 +41,11 @@ def mlp_lda(gamma=np.array([]), penalty_rate=100):
 
     # Hyper Parameters
     input_size = len(train_x[0])
-    hidden_size = 100
+    hidden_size = 128
     num_classes = 80
-    num_epochs = 1
-    batchsize = 5
-    learning_rate = 0.001
+    num_epochs = 10
+    batchsize = 10
+    learning_rate = 0.01
 
     net = Net(input_size, hidden_size, num_classes)
 
@@ -80,7 +82,7 @@ def mlp_lda(gamma=np.array([]), penalty_rate=100):
             targets = Variable(input_train_y).float()
 
             # get the penalty from lda model
-            penalty = get_simple_inference_penalty(net, gamma)
+            penalty = get_simple_inference_penalty(net)
 
             # Forward + Backward + Optimize
             optimizer.zero_grad()  # zero the gradient buffer
@@ -142,8 +144,10 @@ def mlp_lda(gamma=np.array([]), penalty_rate=100):
     # torch.save(net.state_dict(), 'model.pkl')
 
 
-def get_simple_inference_penalty(net, gamma):
+def get_simple_inference_penalty(net):
     # get loss from gamma with lda model
+    # gamma = get_gamma_lda('../data-repository/selected_docs4LDA.csv', 20)
+    gamma = CsvUtility.read_array_from_csv('../data-repository', 'gamma_result.csv')
     penalty = Variable(torch.FloatTensor([0.0]))
     gammas = Variable(torch.from_numpy(gamma)).float()
     for para_iter, para in enumerate(net.parameters()):
@@ -156,8 +160,69 @@ def get_simple_inference_penalty(net, gamma):
 
     return penalty
 
-def get_inference_penalty():
+def get_inference_penalty(net, hidden_size, docs_path, topic_num):
+    # train the lda model
+    selected_docs = pd.read_csv(docs_path, header=None, index_col=[0]).values
+    print 'number of docs:', selected_docs.shape
+    # print selected_docs[:5]
+    texts = [[word for word in doc[0].split(' ')] for doc in selected_docs]
+    # pprint(texts[:5])
+    dictionary = corpora.Dictionary(texts)
+    dictionary.save_as_text('../data-repository/available_word_in_literature.csv')
+    print dictionary
+    # print dictionary.token2id
+    corpus = [dictionary.doc2bow(text) for text in texts]
+    print corpus[:5]
+    print len(corpus)
+    lda_model = models.LdaModel(corpus, id2word=dictionary, num_topics=topic_num, update_every=1, chunksize=1000, passes=1)
+
     # to inference the new doc
+    # initialize the variational distribution q(theta|gamma) for the chunk
+    init_gamma = utils.get_random_state(None).gamma(100., 1. / 100., (hidden_size, topic_num))
+    Elogtheta = matutils.dirichlet_expectation(init_gamma)
+    expElogtheta = np.exp(Elogtheta)
+
+    converged = 0
+    # Now, for each document d update that document's gamma and phi
+    # Inference code copied from Hoffman's `onlineldavb.py` (esp. the
+    # Lee&Seung trick which speeds things up by an order of magnitude, compared
+    # to Blei's original LDA-C code, cool!).
+    for para_iter, para in enumerate(net.parameters()):
+        if para_iter == 0:
+            para_data = para.abs()
+            for d, doc in enumerate(chunk):
+                if len(doc) > 0 and not isinstance(doc[0][0], six.integer_types + (np.integer,)):
+                    # make sure the term IDs are ints, otherwise np will get upset
+                    ids = [int(idx) for idx, _ in doc]
+                else:
+                    ids = [idx for idx, _ in doc]
+                cts = np.array([cnt for _, cnt in doc])
+                gammad = init_gamma[d, :]
+                Elogthetad = Elogtheta[d, :]
+                expElogthetad = expElogtheta[d, :]
+                expElogbetad = lda_model.expElogbeta[:, ids]
+
+                # The optimal phi_{dwk} is proportional to expElogthetad_k * expElogbetad_w.
+                # phinorm is the normalizer.
+                # TODO treat zeros explicitly, instead of adding 1e-100?
+                phinorm = np.dot(expElogthetad, expElogbetad) + 1e-100
+
+                # Iterate between gamma and phi until convergence
+                for _ in xrange(lda_model.iterations):
+                    lastgamma = gammad
+                    # We represent phi implicitly to save memory and time.
+                    # Substituting the value of the optimal phi back into
+                    # the update for gamma gives this update. Cf. Lee&Seung 2001.
+                    gammad = lda_model.alpha + expElogthetad * np.dot(cts / phinorm, expElogbetad.T)
+                    Elogthetad = matutils.dirichlet_expectation(gammad)
+                    expElogthetad = np.exp(Elogthetad)
+                    phinorm = np.dot(expElogthetad, expElogbetad) + 1e-100
+                    # If gamma hasn't changed much, we're done.
+                    meanchange = np.mean(abs(gammad - lastgamma))
+                    if meanchange < lda_model.gamma_threshold:
+                        converged += 1
+                        break
+                init_gamma[d, :] = gammad
     pass
 
 
@@ -210,7 +275,6 @@ def get_gamma_lda(docs_path, topic_num):
     # print feature_index[:5]
     f_i = np.array(feature_index)
     # print f_i.shape, f_i[:, 1].max()
-
     # np.zeros((feature_index.shape[0], gamma_data.shape[1]))
     for i in range(f_i.shape[0]):
         feature_word2id[f_i[i][0]] = int(f_i[i][1])
@@ -233,5 +297,7 @@ def get_gamma_lda(docs_path, topic_num):
 if __name__ == '__main__':
 
     #gamma_data = get_gamma_lda('../data-repository/selected_docs4LDA.csv', 20)
-    gamma_data = CsvUtility.read_array_from_csv('../data-repository', 'gamma_result.csv')
-    mlp_lda(gamma=gamma_data, penalty_rate=1000)
+    # gamma_data = CsvUtility.read_array_from_csv('../data-repository', 'gamma_result.csv')
+    mlp_lda(penalty_rate=100)
+    # get_inference_penalty(0, '../data-repository/selected_docs4LDA.csv', 20)
+

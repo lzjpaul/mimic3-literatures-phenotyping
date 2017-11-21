@@ -4,6 +4,10 @@ import numpy as np
 from utility.csv_utility import CsvUtility
 from utility.nlp_utility import NLP_Utility
 import datetime
+from torch.autograd import Variable
+import torch
+from scipy.special import psi
+from gensim import matutils
 
 # frame = pd.DataFrame(np.arange(8).reshape((2, 4)), index=['two', 'one'], columns=['d', 'a', 'b', 'c'])
 #
@@ -175,5 +179,12 @@ sum = max.sum()
 print sum
 re = Variable(torch.DoubleTensor([1.0]))/sum
 print re
+
+a = Variable(torch.FloatTensor([1.1]))
+print a
+print psi([1.0])
+# print psi(a)
+print matutils.dirichlet_expectation(np.array([1.0]))
+print matutils.dirichlet_expectation(a)
 '''
-print [0]*5
+print str('"yang"').replace('"', '')

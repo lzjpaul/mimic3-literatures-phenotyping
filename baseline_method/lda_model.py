@@ -31,8 +31,9 @@ def process_lda(docs_path, topic_num):
     theta = lda_model.get_document_topics(corpus)
     print 'theta: ', theta
     print len(theta)
-    print theta[0]
-    return lda_model.show_topics(10, 10), theta
+    # for i in range(len(theta)):
+    #     print theta[i][0]
+    return lda_model.show_topics(20, 50), theta
 
 def convert_theta2array(topic_num, theta=[]):
     theta_array = []
@@ -43,11 +44,40 @@ def convert_theta2array(topic_num, theta=[]):
         theta_array.append(per_doc_topics)
     return theta_array
 
+def change_topics_type(topics_from_lda):
+    topics_info = {}
+    for topic_line in topics_from_lda:
+        words_dists = []
+        for wds in topic_line[1].split(' + '):
+            words_dists.append(wds.split('*'))
+        topics_info[topic_line[0]] = words_dists
+    return topics_info
+
+def show_better_topics(topics_info, word_descriptions):
+    with open('../data-repository/show_topics.csv', 'w') as wf:
+        for items in topics_info.keys():
+            wf.write(str(items) + '\n')
+            word_list = topics_info[items]
+            for word in word_list:
+                descri = word_descriptions[word[1].replace('"', '')]
+                line_text = word[0] + '\t' + word[1] + '\t' + descri + '\n'
+                wf.write(line_text)
+
+
 
 
 if __name__ == '__main__':
     # pprint(process_lda('../data-repository/selected_docs4LDA.csv', 20))
-    _, theta = process_lda('../data-repository/selected_docs4LDA.csv', 20)
+    topics, theta = process_lda('../data-repository/selected_docs4LDA.csv', 20)
+    pprint(topics)
+    topics_information = change_topics_type(topics)
+    entity_df = np.array(pd.read_csv('../data-repository/entity_dict.csv', header=None))
+    word_descrip_dict = {}
+    for entity_line in entity_df:
+        word_descrip_dict[entity_line[0]] = entity_line[1]
+    show_better_topics(topics_information, word_descrip_dict)
+    '''
     theta_array = convert_theta2array(20, theta)
     # CsvUtility.write_array2csv(theta_array, '../data-repository', 'theta_array.csv')
     pd.DataFrame(theta_array).to_csv('../data-repository/theta_array.csv', sep='\t', columns=None, index=False)
+    '''

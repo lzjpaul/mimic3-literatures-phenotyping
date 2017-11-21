@@ -11,7 +11,7 @@ Original experimental code of the model which combines LDA with MLP
     5. pandas
     6. cPickle
     7. matplotlib
-### Data Preprocessing：  
+### Data Preprocessing：
      Better create a new file folder named "data-repository" to save the intermediate file.
 1. **MIMICIII data prepeocessing for MLP**  
     * /scripts/generate_all_event.py   
