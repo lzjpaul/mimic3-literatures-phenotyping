@@ -4,7 +4,7 @@
 import cPickle as pickle
 import pandas as pd
 import numpy as np
-import os
+from os import path
 import math
 from random import randrange, shuffle
 import json
@@ -15,6 +15,8 @@ from utility.nlp_utility import NLP_Utility
 
 num_pred_diag = 80
 balance_percent = 4 / 100
+
+Path = path.join(path.split(path.split(path.abspath(path.dirname(__file__)))[0])[0], 'medical_data')
 
 
 def get_first_index(value_list, value):
@@ -28,7 +30,7 @@ def get_first_index(value_list, value):
 
 def get_instance(time_before_diag = 90):
     print 'reading.....'
-    all_events = CsvUtility.read_pickle('../data-repository/allevents.pkl', 'r')
+    all_events = CsvUtility.read_pickle(path.join(Path, 'data-repository/allevents.pkl'), 'r')
     print all_events.shape
     all_events.dropna(axis=0, how='any', inplace=True)
     print all_events.shape
@@ -148,9 +150,9 @@ def get_instance(time_before_diag = 90):
     print 'after limit the predict diagnoses, num of seq: ', len(after_del_sequence)
     print 'max/min of seq: ', seq_max, seq_min
     print 'number of unique items:', len(unique_events)
-    CsvUtility.write2pickle('../data-repository/after_instance.pkl', after_del_sequence, 'w')
-    CsvUtility.write2pickle('../data-repository/event_instance_dict.pkl', unique_events, 'w')
-    CsvUtility.write2pickle('../data-repository/predict_diags_dict.pkl', predicted_diags, 'w')
+    CsvUtility.write2pickle(path.join(Path, 'data-repository/after_instance.pkl'), after_del_sequence, 'w')
+    CsvUtility.write2pickle(path.join(Path, 'data-repository/event_instance_dict.pkl'), unique_events, 'w')
+    CsvUtility.write2pickle(path.join(Path, 'data-repository/predict_diags_dict.pkl'), predicted_diags, 'w')
     print '************************************************************'
     #######################################################################################################
 

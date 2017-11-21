@@ -304,7 +304,7 @@ if __name__ == '__main__':
     #     os.makedirs(args.output_path)
     # except Exception:
     #     pass
-    '''
+
     print "prepare the dict of subject(patient), diagnosis, medication, labtest by limit minimal count number"
     subject_admission_over('MIMICIII_data/ADMISSIONS.csv', 1)
     print "============================================================================="
@@ -320,7 +320,7 @@ if __name__ == '__main__':
     # get_lab_event()
     # get_medication_event()
     get_events_together()
-    '''
+
     all_events = CsvUtility.read_pickle(path.join(Path, 'data-repository/allevents.pkl'), 'r')
     for i in all_events.ix[0, :]:
         print i
