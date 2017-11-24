@@ -6,6 +6,12 @@ from gensim import corpora, models, utils, matutils
 import numpy as np
 import pandas as pd
 from pprint import pprint
+import sys
+import os
+
+sys.path.append(os.path.split(os.path.abspath(os.path.dirname(__file__)))[0])
+
+
 
 from utility.csv_utility import CsvUtility
 from baseline_method.load_data import load_corpus, reload_corpus
