@@ -4,7 +4,11 @@ from utility.directory_utility import Directory
 from utility.csv_utility import CsvUtility
 from utility.plot_utility import draw_pl
 from gensim import corpora
+import sys
+from os import path
+sys.path.append(path.split(path.abspath(path.dirname(__file__)))[0])
 
+Path = path.join(path.split(path.split(path.abspath(path.dirname(__file__)))[0])[0], 'medical_data')
 
 def get_good_docs(file_path, limit_count, limit_kind):
     file_contend = np.array(pd.read_csv(file_path, header=None))
@@ -38,7 +42,7 @@ def get_docs_frequence_kind_map(file_path):
 
 if __name__ == '__main__':
     # get_good_docs('../data-repository/result/jack_1.csv', 10, 2)
-    file_list = Directory.folder_process('../data-repository/result_0.8')
+    file_list = Directory.folder_process(Path+'/data-repository/result_0.8')
 
     merge_dict = dict({})
     doc_map = []
@@ -53,10 +57,10 @@ if __name__ == '__main__':
     texts = [[word for word in doc.split(' ')] for doc in merge_dict.values()]
     # pprint(texts[:5])
     dictionary = corpora.Dictionary(texts)
-    dictionary.save('../data-repository/available_word_in_literature.dict')
+    dictionary.save(Path+'/data-repository/available_word_in_literature.dict')
     print dictionary
 
-    CsvUtility.write_dict2csv(merge_dict, '../data-repository', 'selected_docs4LDA.csv')
+    CsvUtility.write_dict2csv(merge_dict, Path+'/data-repository', 'selected_docs4LDA.csv')
 
 
 
