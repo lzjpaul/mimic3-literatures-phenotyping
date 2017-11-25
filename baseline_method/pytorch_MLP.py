@@ -89,7 +89,8 @@ def mlp_lda(penalty_rate=100):
             targets = Variable(input_train_y).float()
 
             # get the penalty from lda model
-            penalty = get_simple_inference_penalty(net)
+            #penalty = get_simple_inference_penalty(net)
+            penalty = 0
 
             # Forward + Backward + Optimize
             optimizer.zero_grad()  # zero the gradient buffer
@@ -304,7 +305,7 @@ def get_gamma_lda(docs_path, topic_num):
 
 if __name__ == '__main__':
 
-    gamma_data = get_gamma_lda(Path+'/data-repository/selected_docs4LDA.csv', 20)
+    # gamma_data = get_gamma_lda(Path+'/data-repository/selected_docs4LDA.csv', 20)
     # gamma_data = CsvUtility.read_array_from_csv('../data-repository', 'gamma_result.csv')
     mlp_lda(penalty_rate=0)
     # get_inference_penalty(0, '../data-repository/selected_docs4LDA.csv', 20)
