@@ -1,7 +1,12 @@
 #!/usr/bin/env Python
 # coding=utf-8
-
+import sys
+import os
+from sys import path
 import numpy as np
+sys.path.append(os.path.split(os.path.abspath(os.path.dirname(__file__)))[0])
+
+Path = path.join(path.split(path.split(path.abspath(path.dirname(__file__)))[0])[0], 'medical_data')
 
 from utility.csv_utility import CsvUtility
 from utility.double_dict_utility import DictDoubleMap
@@ -29,15 +34,15 @@ def get_dataset(data_pickle_path, word_dict_path, predict_dict_path):
         if i_iter % 1000 == 0:
             print 'complete {0} of {1}'.format(i_iter, len(all_events))
 
-    CsvUtility.write_dict2csv(feature_dict.get_word2index(), '../data-repository/', 'feature2index.csv')
-    CsvUtility.write_dict2csv(pred_dict.get_word2index(), '../data-repository/', 'predict2index.csv')
-    CsvUtility.write_array2csv(feature_matrix, '../data-repository/', 'feature_matrix.csv')
-    CsvUtility.write_array2csv(result_matrix, '../data-repository/', 'result_matrix.csv')
+    CsvUtility.write_dict2csv(feature_dict.get_word2index(), Path+'/data-repository/', 'feature2index.csv')
+    CsvUtility.write_dict2csv(pred_dict.get_word2index(), Path+'/data-repository/', 'predict2index.csv')
+    CsvUtility.write_array2csv(feature_matrix, Path+'/data-repository/', 'feature_matrix.csv')
+    CsvUtility.write_array2csv(result_matrix, Path+'/data-repository/', 'result_matrix.csv')
 
     return feature_matrix, result_matrix
 
 
-def load_corpus(all_path='../data-repository/', train_perc=0.7):
+def load_corpus(all_path=Path+'/data-repository/', train_perc=0.7):
     x, y = get_dataset(all_path + 'after_instance.pkl', all_path + 'event_instance_dict.pkl',
                        all_path + 'predict_diags_dict.pkl')
     train_size = int(x.shape[0] * train_perc)
@@ -46,18 +51,18 @@ def load_corpus(all_path='../data-repository/', train_perc=0.7):
     idx = np.random.permutation(x.shape[0])
     x_train = x[idx]
     y_train = y[idx]
-    CsvUtility.write_array2csv(idx, '../data-repository/', 'random_idx.csv')
+    CsvUtility.write_array2csv(idx, Path+'/data-repository/', 'random_idx.csv')
     return x_train[:train_size], y_train[:train_size], x_train[train_size:], y_train[train_size:], idx
 
 
-def reload_corpus(all_path='../data-repository/', train_perc=0.7, shuffle=False):
+def reload_corpus(all_path=Path+'/data-repository/', train_perc=0.7, shuffle=False):
     x = CsvUtility.read_array_from_csv(all_path, 'feature_matrix.csv')
     y = CsvUtility.read_array_from_csv(all_path, 'result_matrix.csv')
     train_size = int(x.shape[0] * train_perc)
     # shuffle the train set
     if shuffle:
         idx = np.random.permutation(x.shape[0])
-        CsvUtility.write_array2csv(idx, '../data-repository/', 'random_idx.csv')
+        CsvUtility.write_array2csv(idx, Path+'/data-repository/', 'random_idx.csv')
     else:
         idx = CsvUtility.read_array_from_csv(all_path, 'random_idx.csv')
     x_train = x[idx]

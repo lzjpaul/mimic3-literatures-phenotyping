@@ -8,10 +8,11 @@ import pandas as pd
 from pprint import pprint
 import sys
 import os
+from os import path
 
 sys.path.append(os.path.split(os.path.abspath(os.path.dirname(__file__)))[0])
 
-
+Path = path.join(path.split(path.split(path.abspath(path.dirname(__file__)))[0])[0], 'medical_data')
 
 from utility.csv_utility import CsvUtility
 from baseline_method.load_data import load_corpus, reload_corpus
