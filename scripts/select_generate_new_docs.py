@@ -8,7 +8,7 @@ sys.path.append(path.split(path.abspath(path.dirname(__file__)))[0])
 
 from utility.directory_utility import Directory
 from utility.csv_utility import CsvUtility
-from utility.plot_utility import draw_pl
+# from utility.plot_utility import draw_pl
 Path = path.join(path.split(path.split(path.abspath(path.dirname(__file__)))[0])[0], 'medical_data')
 
 def get_good_docs(file_path, limit_count, limit_kind):
@@ -53,7 +53,7 @@ if __name__ == '__main__':
         merge_dict.update(dict_tmp)
         print 'after the merge : ', len(merge_dict)
         doc_map.extend(get_docs_frequence_kind_map(file_path=file_path))
-    draw_pl(x_y=doc_map, type='o')
+    # draw_pl(x_y=doc_map, type='o')
     # print merge_dict
     texts = [[word for word in doc.split(' ')] for doc in merge_dict.values()]
     # pprint(texts[:5])
