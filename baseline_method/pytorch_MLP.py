@@ -136,7 +136,7 @@ def mlp_lda(penalty_rate=100):
             para4save = para4.data.numpy()
 
             print 'the first parameter: ', para4save.shape
-            CsvUtility.write_array2csv(para4save, '../data-repository',
+            CsvUtility.write_array2csv(para4save, Path+'/data-repository',
                                        'temp_parameter.csv')
 
     # get the precision of test data
@@ -154,7 +154,7 @@ def mlp_lda(penalty_rate=100):
 def get_simple_inference_penalty(net):
     # get loss from gamma with lda model
     # gamma = get_gamma_lda('../data-repository/selected_docs4LDA.csv', 20)
-    gamma = CsvUtility.read_array_from_csv('../data-repository', 'gamma_result.csv')
+    gamma = CsvUtility.read_array_from_csv(Path+'/data-repository', 'gamma_result.csv')
     penalty = Variable(torch.FloatTensor([0.0]))
     gammas = Variable(torch.from_numpy(gamma)).float()
     for para_iter, para in enumerate(net.parameters()):
@@ -167,6 +167,7 @@ def get_simple_inference_penalty(net):
 
     return penalty
 
+# not ready...
 def get_inference_penalty(net, hidden_size, docs_path, topic_num):
     # train the lda model
     selected_docs = pd.read_csv(docs_path, header=None, index_col=[0]).values
@@ -175,7 +176,7 @@ def get_inference_penalty(net, hidden_size, docs_path, topic_num):
     texts = [[word for word in doc[0].split(' ')] for doc in selected_docs]
     # pprint(texts[:5])
     dictionary = corpora.Dictionary(texts)
-    dictionary.save_as_text('../data-repository/available_word_in_literature.csv')
+    dictionary.save_as_text(Path+'/data-repository/available_word_in_literature.csv')
     print dictionary
     # print dictionary.token2id
     corpus = [dictionary.doc2bow(text) for text in texts]
@@ -240,7 +241,7 @@ def get_gamma_lda(docs_path, topic_num):
     texts = [[word for word in doc[0].split(' ')] for doc in selected_docs]
     # pprint(texts[:5])
     dictionary = corpora.Dictionary(texts)
-    dictionary.save_as_text('../data-repository/available_word_in_literature.csv')
+    dictionary.save_as_text(Path+'/data-repository/available_word_in_literature.csv')
     print dictionary
     # print dictionary.token2id
     corpus = [dictionary.doc2bow(text) for text in texts]
@@ -254,7 +255,7 @@ def get_gamma_lda(docs_path, topic_num):
     gamma = lda_model.state.get_lambda()
     gamma = (gamma / gamma.sum(axis=0)).T
     print "shape of gamma :", gamma.shape
-    CsvUtility.write_array2csv(gamma, '../data-repository', 'gamma_from_LDA.csv')
+    CsvUtility.write_array2csv(gamma, Path+'/data-repository', 'gamma_from_LDA.csv')
     pprint(lda_model.show_topics(10, 10))
 
     # change the gamma, because the number of word is less than the number of feature
@@ -262,7 +263,7 @@ def get_gamma_lda(docs_path, topic_num):
     # of (feature_size, topic_number)
 
     gamma_id2word = {}
-    with open('../data-repository/available_word_in_literature.csv') as file:
+    with open(Path+'/data-repository/available_word_in_literature.csv') as file:
         line_num = file.readline()
         # print line_num
         lines_contend = file.readlines()
@@ -276,7 +277,7 @@ def get_gamma_lda(docs_path, topic_num):
     # print np.array(id_list).max()
 
     feature_word2id = {}
-    feature_index = pd.read_csv('../data-repository/feature2index.csv',
+    feature_index = pd.read_csv(Path+'/data-repository/feature2index.csv',
                                 header=None, index_col=None)
     # print feature_index.shape
     # print feature_index[:5]
@@ -296,7 +297,7 @@ def get_gamma_lda(docs_path, topic_num):
             print i, 'line'
     print change_index_result[:5]
     print 'after changing the size of result: ', change_index_result.shape
-    CsvUtility.write_array2csv(change_index_result, '../data-repository',
+    CsvUtility.write_array2csv(change_index_result, Path+'/data-repository',
                                'gamma_result.csv')
     return change_index_result
 
