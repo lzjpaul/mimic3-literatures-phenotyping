@@ -167,7 +167,7 @@ def get_simple_inference_penalty(net):
 
     return penalty
 
-# not ready...
+# not finish...
 def get_inference_penalty(net, hidden_size, docs_path, topic_num):
     # train the lda model
     selected_docs = pd.read_csv(docs_path, header=None, index_col=[0]).values
@@ -306,6 +306,6 @@ if __name__ == '__main__':
 
     gamma_data = get_gamma_lda(Path+'/data-repository/selected_docs4LDA.csv', 20)
     # gamma_data = CsvUtility.read_array_from_csv('../data-repository', 'gamma_result.csv')
-    mlp_lda(penalty_rate=100)
+    mlp_lda(penalty_rate=0)
     # get_inference_penalty(0, '../data-repository/selected_docs4LDA.csv', 20)
 
