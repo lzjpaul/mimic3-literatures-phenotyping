@@ -2,8 +2,9 @@
 # coding=utf-8
 import sys
 import os
-from sys import path
+from os import path
 import numpy as np
+
 sys.path.append(os.path.split(os.path.abspath(os.path.dirname(__file__)))[0])
 
 Path = path.join(path.split(path.split(path.abspath(path.dirname(__file__)))[0])[0], 'medical_data')
