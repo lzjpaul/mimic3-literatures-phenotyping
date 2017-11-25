@@ -1,13 +1,14 @@
 import pandas as pd
 import numpy as np
-from utility.directory_utility import Directory
-from utility.csv_utility import CsvUtility
-from utility.plot_utility import draw_pl
 from gensim import corpora
 import sys
 from os import path
+
 sys.path.append(path.split(path.abspath(path.dirname(__file__)))[0])
 
+from utility.directory_utility import Directory
+from utility.csv_utility import CsvUtility
+from utility.plot_utility import draw_pl
 Path = path.join(path.split(path.split(path.abspath(path.dirname(__file__)))[0])[0], 'medical_data')
 
 def get_good_docs(file_path, limit_count, limit_kind):
