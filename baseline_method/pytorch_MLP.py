@@ -79,6 +79,7 @@ def mlp_lda(penalty_rate=100):
                                   num_workers=2)
 
     # Train the Model
+    neuron_topics = np.array([])
     for epoch in range(num_epochs):
         running_loss = 0.0
         count_isntance = 0
@@ -89,7 +90,7 @@ def mlp_lda(penalty_rate=100):
             targets = Variable(input_train_y).float()
 
             # get the penalty from lda model
-            penalty = get_simple_inference_penalty(net)
+            penalty, neuron_topics = get_simple_inference_penalty(net)
             #penalty = 0
 
             # Forward + Backward + Optimize
@@ -112,6 +113,7 @@ def mlp_lda(penalty_rate=100):
                 running_loss = 0.0
                 count_isntance = 0
     print 'finish training'
+    CsvUtility.write_array2csv(neuron_topics, Path+'/data-repository', 'neuron_topics.csv')
 
     # Test the Model
     res = []
@@ -158,16 +160,17 @@ def get_simple_inference_penalty(net):
     gamma = CsvUtility.read_array_from_csv(Path+'/data-repository', 'gamma_result.csv')
     penalty = Variable(torch.FloatTensor([0.0]))
     gammas = Variable(torch.from_numpy(gamma)).float()
+    latent_neuron_topics = np.array([])
     for para_iter, para in enumerate(net.parameters()):
         if para_iter == 0:
             latent_neuron_topics = para.abs().mm(gammas)
             # print 'latent_neuron_topics : ', latent_neuron_topics
             latent_neuron_topics = latent_neuron_topics / (latent_neuron_topics.sum(dim=1).view(-1, 1))
-            print latent_neuron_topics
+
             # print 'Norm latent_neuron_topics : ', latent_neuron_topics
             penalty = Variable(torch.FloatTensor([1.0])) / (latent_neuron_topics.max(dim=1)[0].sum())
 
-    return penalty
+    return penalty, latent_neuron_topics.data.numpy()
 
 # not finish...
 def get_inference_penalty(net, hidden_size, docs_path, topic_num):
