@@ -163,6 +163,7 @@ def get_simple_inference_penalty(net):
             latent_neuron_topics = para.abs().mm(gammas)
             # print 'latent_neuron_topics : ', latent_neuron_topics
             latent_neuron_topics = latent_neuron_topics / (latent_neuron_topics.sum(dim=1).view(-1, 1))
+            print latent_neuron_topics
             # print 'Norm latent_neuron_topics : ', latent_neuron_topics
             penalty = Variable(torch.FloatTensor([1.0])) / (latent_neuron_topics.max(dim=1)[0].sum())
 
