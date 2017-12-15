@@ -99,8 +99,8 @@ def mlp_lda(penalty_rate=100):
             optimizer.zero_grad()  # zero the gradient buffer
             outputs = net(inputs)
             loss = criterion(outputs, targets)
-            print 'criterion loss : ', loss
-            print 'penalty loss: ', penalty
+            #print 'criterion loss : ', loss
+            #print 'penalty loss: ', penalty
             loss = loss + penalty_rate * penalty
             # print 'penalty loss : ', (penalty_rate * penalty).data.numpy()
             loss.backward()
