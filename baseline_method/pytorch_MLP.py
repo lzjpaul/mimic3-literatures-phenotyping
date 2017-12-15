@@ -52,7 +52,7 @@ def mlp_lda(penalty_rate=100):
     input_size = len(train_x[0])
     hidden_size = 128
     num_classes = 80
-    num_epochs = 3
+    num_epochs = 10
     batchsize = 10
     learning_rate = 0.001
 
