@@ -2,9 +2,11 @@ from gensim import corpora, models
 import pandas as pd
 import numpy as np
 from pprint import pprint
+import lda
 
 from utility.csv_utility import CsvUtility
-
+from os import path
+Path = path.join(path.split(path.split(path.abspath(path.dirname(__file__)))[0])[0], 'medical_data')
 
 def process_lda(docs_path, topic_num):
     selected_docs = pd.read_csv(docs_path, header=None, index_col=[0]).values
@@ -13,7 +15,7 @@ def process_lda(docs_path, topic_num):
     texts = [[word for word in doc[0].split(' ')] for doc in selected_docs]
     # pprint(texts[:5])
     dictionary = corpora.Dictionary(texts)
-    dictionary.save_as_text('../data-repository/available_word_in_literature.csv')
+    dictionary.save_as_text(Path+'/data-repository/available_word_in_literature.csv')
     print dictionary
     # print dictionary.token2id
     corpus = [dictionary.doc2bow(text) for text in texts]
@@ -23,17 +25,20 @@ def process_lda(docs_path, topic_num):
 
     # lda_model.print_topics(10, 10)
     # gamma = lda_model.get_topics()
-    gamma = lda_model.state.get_lambda()
+    #gamma = lda_model.state.get_lambda()
     # gamma = gamma / gamma.sum(axis=0)
-    print "shape of gamma :", gamma.shape
+    #print "shape of gamma :", gamma.shape
     # print gamma[:30]
-    CsvUtility.write_array2csv(gamma, '../data-repository', 'gamma_from_LDA.csv')
-    theta = lda_model.get_document_topics(corpus)
-    print 'theta: ', theta
-    print len(theta)
-    # for i in range(len(theta)):
-    #     print theta[i][0]
-    return lda_model.show_topics(20, 50), theta
+    #CsvUtility.write_array2csv(gamma, Path+'/data-repository', 'gamma_from_LDA.csv')
+    '''
+    beta = lda_model.state.sstats
+    print beta.shape
+    print beta[:5]
+    
+    return lda_model.show_topics(20, 50), beta
+    '''
+    for i in range(30):
+        print lda_model.get_term_topics(i)
 
 def convert_theta2array(topic_num, theta=[]):
     theta_array = []
@@ -68,14 +73,14 @@ def show_better_topics(topics_info, word_descriptions):
 
 if __name__ == '__main__':
     # pprint(process_lda('../data-repository/selected_docs4LDA.csv', 20))
-    topics, theta = process_lda('../data-repository/selected_docs4LDA.csv', 20)
-    pprint(topics)
-    topics_information = change_topics_type(topics)
-    entity_df = np.array(pd.read_csv('../data-repository/entity_dict.csv', header=None))
-    word_descrip_dict = {}
-    for entity_line in entity_df:
-        word_descrip_dict[entity_line[0]] = entity_line[1]
-    show_better_topics(topics_information, word_descrip_dict)
+    process_lda(Path+'/data-repository/selected_docs4LDA.csv', 20)
+
+    # topics_information = change_topics_type(topics)
+    # entity_df = np.array(pd.read_csv('../data-repository/entity_dict.csv', header=None))
+    # word_descrip_dict = {}
+    # for entity_line in entity_df:
+        # word_descrip_dict[entity_line[0]] = entity_line[1]
+    # show_better_topics(topics_information, word_descrip_dict)
     '''
     theta_array = convert_theta2array(20, theta)
     # CsvUtility.write_array2csv(theta_array, '../data-repository', 'theta_array.csv')
