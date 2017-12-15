@@ -13,8 +13,8 @@ Path = path.join(path.split(path.split(path.abspath(path.dirname(__file__)))[0])
 
 def get_simple_inference_penalty(net):
     # get loss from gamma with lda model
-    # gamma = get_gamma_lda('../data-repository/selected_docs4LDA.csv', 20)
-    gamma = CsvUtility.read_array_from_csv(Path+'/data-repository', 'gamma_result.csv')
+    gamma = get_topicdist_lda(Path+'/data-repository/selected_docs4LDA.csv', 20)
+    # gamma = CsvUtility.read_array_from_csv(Path+'/data-repository', 'gamma_result.csv')
     penalty = Variable(torch.FloatTensor([0.0]))
     gammas = Variable(torch.from_numpy(gamma)).float()
     latent_neuron_topics = np.array([])
