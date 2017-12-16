@@ -17,7 +17,7 @@ Path = path.join(path.split(path.split(path.abspath(path.dirname(__file__)))[0])
 from utility.csv_utility import CsvUtility
 from baseline_method.load_data import load_corpus, reload_corpus
 from baseline_method.compute_accurency import get_macro_micro_auc, get_auc_list
-from baseline_method.get_LDA_penalty import get_simple_inference_penalty
+from baseline_method.get_LDA_penalty import get_simple_inference_penalty, get_topicdist_lda
 
 
 
@@ -165,6 +165,7 @@ if __name__ == '__main__':
     # gamma_data = get_gamma_lda(Path+'/data-repository/selected_docs4LDA.csv', 20)
     # get_gamma_lsi(Path+'/data-repository/selected_docs4LDA.csv', 20)
     # gamma_data = CsvUtility.read_array_from_csv('../data-repository', 'gamma_result.csv')
+    gamma_data = get_topicdist_lda(Path + '/data-repository/selected_docs4LDA.csv', 20)
     mlp_lda(penalty_rate=0)
     # get_inference_penalty(0, '../data-repository/selected_docs4LDA.csv', 20)
 
