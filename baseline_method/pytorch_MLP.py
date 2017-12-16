@@ -52,7 +52,7 @@ def mlp_lda(penalty_rate=100):
     input_size = len(train_x[0])
     hidden_size = 128
     num_classes = 80
-    num_epochs = 10
+    num_epochs = 20
     batchsize = 10
     learning_rate = 0.001
 
@@ -165,7 +165,7 @@ if __name__ == '__main__':
     # gamma_data = get_gamma_lda(Path+'/data-repository/selected_docs4LDA.csv', 20)
     # get_gamma_lsi(Path+'/data-repository/selected_docs4LDA.csv', 20)
     # gamma_data = CsvUtility.read_array_from_csv('../data-repository', 'gamma_result.csv')
-    gamma_data = get_topicdist_lda(Path + '/data-repository/selected_docs4LDA.csv', 20)
+    # gamma_data = get_topicdist_lda(Path + '/data-repository/selected_docs4LDA.csv', 20)
     mlp_lda(penalty_rate=0)
     # get_inference_penalty(0, '../data-repository/selected_docs4LDA.csv', 20)
 
