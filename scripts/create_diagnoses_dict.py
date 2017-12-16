@@ -296,6 +296,11 @@ def get_final_word_dict():
     # In the end, we get 4350 words, and 5163 descriptions
 
 if __name__ == '__main__':
+    # second step:
+    get_revert_prescription()
+    get_revert_labtest()
+    get_revert_diagnoses_procedures()
     get_final_word_dict()
+
 
 

@@ -160,5 +160,6 @@ def get_instance(time_before_diag = 90):
     #######################################################################################################
 
 if __name__ == '__main__':
+    # the forth step:
     get_instance()
     pass
