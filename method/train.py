@@ -66,6 +66,8 @@ def train(x_train, y_train, lda_model,
     print '0----'
     print sita_dk
     for epoch in range(num_epochs):
+        if epoch > 0:
+            break
         for i, data_iter in enumerate(train_loader, 0):
             # Convert numpy array to torch Variable
             data_x, data_y = data_iter
@@ -99,6 +101,8 @@ def train(x_train, y_train, lda_model,
                     print '3----'
                     print running_loss
             # print loss.data
+            if i > 2:
+                break
             if (i + 1) % 100 == 1:
                 print 'Epoch [%d/%d], Step [%d/%d], Loss: %.4f' \
                       % (epoch + 1, num_epochs, i + 1, x_train.shape[0] / batchsize, mlp_loss.data.numpy()[0] + running_loss)
