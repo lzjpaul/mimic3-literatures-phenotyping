@@ -1,10 +1,11 @@
 import torch
-import numpy as np
 import torch.nn as nn
-import torch.utils.data as Data
 from torch.autograd import Variable
+import torch.utils.data as Data
+import numpy as np
 import sys
 from os import path
+
 sys.path.append(path.split(path.abspath(path.dirname(__file__)))[0])
 from method.define_mlp import Net
 
