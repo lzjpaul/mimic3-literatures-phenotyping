@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 import torch.utils.data as Data
+from torch.autograd import Variable
+
 import numpy as np
 import sys
 from os import path
