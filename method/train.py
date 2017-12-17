@@ -60,7 +60,7 @@ def train(x_train, y_train, lda_model,
     phi_kw = lda_model.get_phi_kw()
     alpha = lda_model.get_alpha()
 
-    sita_dk = np.random.rand((hidden_size, lda_model.topic_num))
+    sita_dk = np.random.rand(hidden_size, lda_model.topic_num)
     for epoch in range(num_epochs):
         for i, data_iter in enumerate(train_loader, 0):
             # Convert numpy array to torch Variable
