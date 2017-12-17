@@ -101,7 +101,7 @@ def train(x_train, y_train, lda_model,
                     print '3----'
                     print running_loss
             # print loss.data
-            if i > 1:
+            if i > 0:
                 break
             if (i + 1) % 100 == 1:
                 print 'Epoch [%d/%d], Step [%d/%d], Loss: %.4f' \
