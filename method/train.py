@@ -59,8 +59,12 @@ def train(x_train, y_train, lda_model,
     # lda result
     phi_kw = lda_model.get_phi_kw()
     alpha = lda_model.get_alpha()
-
+    print 'phi---'
+    print phi_kw
     sita_dk = np.random.rand(hidden_size, lda_model.topic_num)
+    sita_dk = sita_dk/(sita_dk.sum(axis=1)[:, np.newaxis])
+    print '0----'
+    print sita_dk
     for epoch in range(num_epochs):
         for i, data_iter in enumerate(train_loader, 0):
             # Convert numpy array to torch Variable
@@ -71,8 +75,8 @@ def train(x_train, y_train, lda_model,
             # Forward + Backward + Optimize
             net.zero_grad()
             output = net(TX)
-            mlp_loss = criterion(output,TY)
-            # print mlp_loss
+            mlp_loss = criterion(output, TY)
+            print mlp_loss
             output.backward(mlp_loss)
 
             # ToDo:e-step
@@ -84,10 +88,16 @@ def train(x_train, y_train, lda_model,
                 if f_i == 0:
                     # ToDo:m-step
                     F_gradient = compute_F_gradient(sita_DK=sita_dk, phi_KW=phi_kw, weight=f.data.numpy())
+                    print '1---'
+                    print F_gradient
                     sita_dk = update_sita(alpha=alpha, r_DKN=r_DKN, weight=f.data.numpy())
+                    print '2---'
+                    print sita_dk
                     # ToDo: regulization
                     f.data.sub_(torch.from_numpy(F_gradient).float() * learning_rate)
                     running_loss = compute_F(sita_DK=sita_dk, phi_KW=phi_kw, weight=f.data.numpy(), alpha=alpha)
+                    print '3----'
+                    print running_loss
             # print loss.data
             if (i + 1) % 100 == 1:
                 print 'Epoch [%d/%d], Step [%d/%d], Loss: %.4f' \
