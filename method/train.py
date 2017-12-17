@@ -91,7 +91,7 @@ def train(x_train, y_train, lda_model,
             # print loss.data
             if (i + 1) % 100 == 1:
                 print 'Epoch [%d/%d], Step [%d/%d], Loss: %.4f' \
-                      % (epoch + 1, num_epochs, i + 1, x_train.shape[0] / batchsize, running_loss)
+                      % (epoch + 1, num_epochs, i + 1, x_train.shape[0] / batchsize, mlp_loss + running_loss)
     return net, sita_dk
 
 if __name__ == '__main__':
@@ -103,6 +103,7 @@ if __name__ == '__main__':
     w = np.random.rand(3)
     re = update_sita(w, sita, phi)
     print re
+    print np.random.rand(3,5)
     #print re.shape
     '''
     la_sita = sita[np.newaxis, :, :]
