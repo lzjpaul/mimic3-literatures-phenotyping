@@ -13,7 +13,7 @@ from utility.csv_utility import CsvUtility
 from utility.double_dict_utility import DictDoubleMap
 
 
-def get_dataset(data_pickle_path, word_dict_path, predict_dict_path):
+def get_dataset(data_pickle_path, word_dict_path, predict_dict_path, save=False):
     all_events = CsvUtility.read_pickle(data_pickle_path, 'r')
     word_dict = CsvUtility.read_pickle(word_dict_path, 'r')
     predict_dict = CsvUtility.read_pickle(predict_dict_path, 'r')
@@ -34,11 +34,11 @@ def get_dataset(data_pickle_path, word_dict_path, predict_dict_path):
 
         if i_iter % 1000 == 0:
             print 'complete {0} of {1}'.format(i_iter, len(all_events))
-
-    CsvUtility.write_dict2csv(feature_dict.get_word2index(), Path+'/data-repository/', 'feature2index.csv')
-    CsvUtility.write_dict2csv(pred_dict.get_word2index(), Path+'/data-repository/', 'predict2index.csv')
-    CsvUtility.write_array2csv(feature_matrix, Path+'/data-repository/', 'feature_matrix.csv')
-    CsvUtility.write_array2csv(result_matrix, Path+'/data-repository/', 'result_matrix.csv')
+    if save:
+        CsvUtility.write_dict2csv(feature_dict.get_word2index(), Path+'/data-repository/', 'feature2index.csv')
+        CsvUtility.write_dict2csv(pred_dict.get_word2index(), Path+'/data-repository/', 'predict2index.csv')
+        CsvUtility.write_array2csv(feature_matrix, Path+'/data-repository/', 'feature_matrix.csv')
+        CsvUtility.write_array2csv(result_matrix, Path+'/data-repository/', 'result_matrix.csv')
 
     return feature_matrix, result_matrix
 
@@ -69,6 +69,10 @@ def reload_corpus(all_path=Path+'/data-repository/', train_perc=0.7, shuffle=Fal
     x_train = x[idx]
     y_train = y[idx]
     return x_train[:train_size], y_train[:train_size], x_train[train_size:], y_train[train_size:], idx
+
+def load_dataset(all_path=Path+'/data-repository/'):
+    return get_dataset(all_path + 'after_instance.pkl', all_path + 'event_instance_dict.pkl',
+                       all_path + 'predict_diags_dict.pkl')
 
 if __name__ == '__main__':
     training_x, training_y, testing_x, testing_y, idx = load_corpus()

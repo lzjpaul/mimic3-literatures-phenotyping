@@ -179,12 +179,12 @@ sum = max.sum()
 print sum
 re = Variable(torch.DoubleTensor([1.0]))/sum
 print re
-
+'''
 a = Variable(torch.FloatTensor([1.1]))
 print a
 print psi([1.0])
 # print psi(a)
 print matutils.dirichlet_expectation(np.array([1.0]))
-print matutils.dirichlet_expectation(a)
-'''
+print matutils.dirichlet_expectation(a.data)
+
 print str('"yang"').replace('"', '')

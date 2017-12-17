@@ -115,7 +115,8 @@ def mlp_lda(penalty_rate=100):
                        % (epoch + 1, num_epochs, i + 1, train_x.shape[0] / batchsize, running_loss/count_isntance))
                 running_loss = 0.0
                 count_isntance = 0
-                CsvUtility.write_array2csv(neuron_topics, Path + '/data-repository', 'neuron_topics_' + str(i) + '.csv')
+
+        CsvUtility.write_array2csv(neuron_topics, Path + '/data-repository', 'neuron_topics_' + str(epoch) + '.csv')
     print 'finish training'
 
 
