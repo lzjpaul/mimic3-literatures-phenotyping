@@ -3,11 +3,10 @@ import numpy as np
 import torch.nn as nn
 import torch.utils.data as Data
 from torch.autograd import Variable
-from method.define_mlp import Net
 import sys
 from os import path
 sys.path.append(path.split(path.abspath(path.dirname(__file__)))[0])
-
+from method.define_mlp import Net
 
 def compute_r_DKN(sita_DK, phi_KW):
     sita_phi = sita_DK.dot(phi_KW)[:, np.newaxis, :].repeat(sita_DK.shape[1], axis=1)

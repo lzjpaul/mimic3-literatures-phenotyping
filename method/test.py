@@ -3,11 +3,10 @@ import numpy as np
 import torch.nn as nn
 import torch.utils.data as Data
 from torch.autograd import Variable
-from method.define_mlp import Net
 import sys
 from os import path
 sys.path.append(path.split(path.abspath(path.dirname(__file__)))[0])
-
+from method.define_mlp import Net
 from baseline_method.compute_accurency import get_macro_micro_auc, get_auc_list
 
 def test(x_test, y_test, net,
