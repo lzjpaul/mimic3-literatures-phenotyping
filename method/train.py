@@ -4,6 +4,9 @@ import torch.nn as nn
 import torch.utils.data as Data
 from torch.autograd import Variable
 from method.define_mlp import Net
+import sys
+from os import path
+sys.path.append(path.split(path.abspath(path.dirname(__file__)))[0])
 
 
 def compute_r_DKN(sita_DK, phi_KW):

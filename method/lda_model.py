@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import pprint
 from gensim import corpora, models, utils, matutils
+import sys
+sys.path.append(path.split(path.abspath(path.dirname(__file__)))[0])
 
 Path = path.join(path.split(path.split(path.abspath(path.dirname(__file__)))[0])[0], 'medical_data')
 
