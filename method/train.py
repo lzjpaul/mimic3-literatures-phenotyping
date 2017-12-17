@@ -101,7 +101,7 @@ def train(x_train, y_train, lda_model,
             # print loss.data
             if (i + 1) % 100 == 1:
                 print 'Epoch [%d/%d], Step [%d/%d], Loss: %.4f' \
-                      % (epoch + 1, num_epochs, i + 1, x_train.shape[0] / batchsize, mlp_loss + running_loss)
+                      % (epoch + 1, num_epochs, i + 1, x_train.shape[0] / batchsize, mlp_loss.data.numpy()[0] + running_loss)
     return net, sita_dk
 
 if __name__ == '__main__':
