@@ -72,7 +72,7 @@ def train(x_train, y_train, lda_model,
             net.zero_grad()
             output = net(TX)
             mlp_loss = criterion(output,TY)
-            print mlp_loss
+            # print mlp_loss
             output.backward(mlp_loss)
 
             # ToDo:e-step
@@ -86,7 +86,7 @@ def train(x_train, y_train, lda_model,
                     F_gradient = compute_F_gradient(sita_DK=sita_dk, phi_KW=phi_kw, weight=f.data.numpy())
                     sita_dk = update_sita(alpha=alpha, r_DKN=r_DKN, weight=f.data.numpy())
                     # ToDo: regulization
-                    f.data.sub_(F_gradient * learning_rate)
+                    f.data.sub_(torch.from_numpy(F_gradient).float() * learning_rate)
                     running_loss = compute_F(sita_DK=sita_dk, phi_KW=phi_kw, weight=f.data.numpy(), alpha=alpha)
             # print loss.data
             if (i + 1) % 100 == 1:
