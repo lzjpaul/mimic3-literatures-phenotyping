@@ -1,8 +1,5 @@
 from os import path
-import torch
-from torch.autograd import Variable
 import torch.nn as nn
-import torch.nn.functional as F
 import sys
 sys.path.append(path.split(path.abspath(path.dirname(__file__)))[0])
 
